@@ -316,6 +316,7 @@ pbMineCraftDemo.prototype.setTint = function(_shaders)
    	// set the shader program
 	_shaders.setProgram(this.shaderProgram, this.rttTextureNumber);
 	// set the tint values in the shader program
+	gl.uniform1f( _shaders.getUniform( "uGlobalTime"), pbPhaserRender.frameCount );
 	gl.uniform3f( _shaders.getUniform( "uCameraLookAt"), this.camera.lx, this.camera.ly, this.camera.lz );
 	gl.uniform3f( _shaders.getUniform( "uCameraPos"), this.camera.x, this.camera.y, this.camera.z );
 };

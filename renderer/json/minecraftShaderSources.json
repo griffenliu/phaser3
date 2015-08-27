@@ -17,11 +17,15 @@
         "precision mediump float;",
         
         "#define SEALEVEL -25.",
-        "#define MAXSTEPS 256",
-        "#define CAMERA_SCREEN 2.5",
+        "#define MAXSTEPS 512",
+        "#define CAMERA_SCREEN 3.0",
         "#define SUN_POWER 0.4",
         "#define SUN_SIZE 18.0",
         "#define SKY_COLOUR vec3(0.35,0.47,0.60)",
+        "#define TREE_FREQUENCY 0.10",
+        "#define FOLIAGE_SIZE 2.5",
+        "#define TRUNK_TALL 3.5",
+        "#define GAMMA 0.45",
         "//#define HOUSE",
 
         "#define MAT_GRASS 1",
@@ -34,11 +38,11 @@
         "#define MAT_WATER 9",
         "#define MAT_CLOUD 10",
 
+        "uniform float uGlobalTime;",
         "uniform vec3 uCameraPos;",
         "uniform vec3 uCameraLookAt;",
         "uniform sampler2D uImageSampler;",
         
-        "vec3 sundir = normalize( vec3(-0.5,0.6,0.7) );",
         "vec2 iResolution = vec2(1.0, 1.0);",
 
         "float hash( in float n ) {",
@@ -55,7 +59,7 @@
 
         "// port of minecraft",
 
-        "void getMaterialColor( int i, vec2 coord, out vec3 color ) {",
+        "vec3 getMaterialColor( int i, vec2 coord ) {",
         "    // 16x16 texture coordinates",
         "    vec2 uv = floor( coord );",
 
@@ -65,8 +69,8 @@
        	"    // stippling for grass, water, leaves, dirt",
         "    float br = 1. - h * (96./255.);",
 
-        "    // dirt colour",
-        "    color = vec3( 128./255., 64./255., 48./255.);",
+        "    // dirt colour by default",
+        "    vec3 color = vec3( 128./255., 64./255., 48./255.);",
 
         "    if (i == MAT_GRASS) {",
         "        // make jaggy edge for hanging grass",
@@ -115,7 +119,10 @@
 
         "    if (i == MAT_WATER) {",
         "        // water",
-        "        color = vec3(  64./255.,  64./255., 255./255.); // 0x4040ff;",
+        "        h = hash(mod(uv.x + uGlobalTime * 0.0005, 16.0) + uv.y*347.0 + 4321.0 * float(i));",
+		"        br = 1. - h * (96./255.);",
+        "        color = vec3(  32./255.,  64./255., 192./255.);",
+        "        br = br * 0.25 + 0.2;",
         "    }",
 
         "    if (i == MAT_CLOUD) {",
@@ -124,7 +131,7 @@
         "    }",
         "    color *= br;",
         
-        "    return;",
+        "    return color;",
         "}",
 
         "//=====================================================================",
@@ -145,17 +152,17 @@
         "bool map(in vec3 c ) {",
 
         "    vec3 p = c + 0.5;",
-        
+
         "    vec2 fc = floor( c.xz * 0.05 );",
         "    vec3 h = hash3( vec3( fc*vec2(213.123,2134.125), mapTerrain(fc) ) );",
         "    bool hit = false;",
 
-        "    if ( h.z > 0.75 ) {",
+        "    if ( h.z < TREE_FREQUENCY ) {",
         "        vec2 tp = floor( fc * 20. + mod( h.yx * 154.43125, 10. ) ) + 5.5;",
-        "        float h = mapTerrain( tp );",
-        "        if ( h > SEALEVEL ) {",
-        "            if ( all( equal( tp, p.xz ) ) ) hit = c.y < h+4.; // treetrunk",
-        "            if ( distance( p, vec3( tp.x, h+6., tp.y ) ) < 2.5 ) hit = true; // leaves",
+        "        float f = mapTerrain( tp );",
+        "        if ( f > SEALEVEL ) {",
+        "            if ( all( equal( tp, p.xz ) ) ) hit = c.y < f + TRUNK_TALL; // treetrunk",
+        "            if ( distance( p, vec3( tp.x, f + (TRUNK_TALL + FOLIAGE_SIZE), tp.y ) ) < FOLIAGE_SIZE ) hit = true; // leaves",
         "        }",
         "    }",
 
@@ -221,7 +228,7 @@
         "        if ( map(pos) ) {",
         "            // intersect the cube",
         "            vec3 mini = (pos - rayOrigin + 0.5 - 0.5 * vec3(rs)) * ri;",
-        "            float t = max ( mini.x, max ( mini.y, mini.z ) );",
+        "            float t = max ( mini.x, max( mini.y, mini.z ) );",
         "            oDir = moveMask;",
         "            oVos = pos;",
         "            return t;",
@@ -236,7 +243,6 @@
         "    vec3 ri = 1.0/rayDir;",
         "    vec3 rs = sign(rayDir);",
         "    vec3 dis = (pos-rayOrigin + 0.5 + rs*0.5) * ri;",
-        "    float res = 1.0;",
         "    for( int i=0; i<18; i++ )",
         "    {",
         "        if ( map(pos) ) { return 0.; }",
@@ -244,7 +250,7 @@
         "        dis += moveMask * rs * ri;",
         "        pos += moveMask * rs;",
         "    }",
-        "    return res;",
+        "    return 1.0;",
         "}",
 
 
@@ -286,6 +292,8 @@
         "varying vec2 v_texcoord;",
         
         "void main() {",
+        "    vec3 sundir = normalize( vec3(mod(uGlobalTime * .001, 2.0) - 1.0,0.6,0.7) );",
+
         "    // convert texture coordinate into range -1..+1 in x and y directions",
         "    vec2 q = v_texcoord.xy / iResolution.xy;",
         "    vec2 p = -1.0 + 2.0*q;",
@@ -305,11 +313,12 @@
         "    vec3 vv = normalize(cross(ww,uu));",
         "    vec3 rayDir = normalize(p.x*uu + p.y*vv + CAMERA_SCREEN*ww);",
 
-        "    // lighting for the sky",
-        "    float sun = clamp(dot(sundir,rayDir), 0., 1.);",
-        "    // azimuth",
+        "    // sky azimuth",
         "    float azi = exp(rayDir.y) - 1.0;",
         "    vec3 col = clamp(SKY_COLOUR + vec3(-azi * 0.2, -azi * 0.2, azi * 0.6), 0., 1.);",
+
+        "    // sky sun glare",
+        "    float sun = clamp(dot(sundir, rayDir), 0., 1.);",
         "    col = clamp(col + SUN_POWER * vec3(1.0, 1.0, 0.0) * pow( sun, SUN_SIZE ), 0., 1.);",
 
         "    // vos and dir are NOT used if t == 0, faster exit from castRay if no collision",
@@ -329,19 +338,17 @@
         "            if ( vos.y < SEALEVEL ) mMat = MAT_WATER;",
         "        }",
 
-        "        vec3 mCol;",
         "        vec3 mpos = mod( pos * 16., 16. );",
         "        // use normal of the cube face to determine where the texture comes from",
         "        vec2 textureCoord = (nor.y != 0.) ? mpos.xz : (nor.x != 0.) ? -mpos.zy + vec2(32., 32.) : -mpos.xy + vec2(32., 32.);",
-        "        getMaterialColor( mMat, textureCoord, mCol );",
+        "        vec3 mCol = getMaterialColor( mMat, textureCoord );",
 
         "        // cube face catches the suns rays?",
         "        float dif = clamp( dot( nor, sundir ), 0.0, 1.0 );",
         "        float sha = 0.0;",
         "        if ( dif > 0.01 ) sha = castVRay( pos + nor * 0.01, sundir, 32.0 );",
         "        float bac = clamp( dot( nor, normalize(sundir*vec3(-1.0,0.0,-1.0)) ), 0.0, 1.0 );",
-        "        float sky = 0.5 + 0.5*nor.y;",
-        "        float amb = 1.0;",
+        "        float sky = 0.5 + 0.5 * nor.y;",
 
         "        // ambient occlusion",
 
@@ -366,27 +373,23 @@
         "        occ = occ*occ;",
         
         "        vec3 lin = vec3(0.0);",
-        "        lin += 4.0*dif*vec3(1.)*(0.5+0.5*occ)*(0.25+0.75*sha);",
-        "        lin += 1.8*bac*vec3(1.0,0.5,1.0)*(0.5+0.5*occ);",
-        "        lin += 4.0*sky*vec3(0.4,0.51,0.85)*occ;",
+        "        lin += 4.0 * dif * vec3(1.) * (0.5+0.5*occ) * (0.25+0.75*sha);",
+        "        lin += 1.8 * bac * vec3(1.0,0.5,1.0) * (0.5+0.5*occ);",
+        "        lin += 4.0 * sky * vec3(0.4,0.51,0.85) * occ;",
 
-        "        if ( mMat == 10 ) {",
+        "        if ( mMat == MAT_CLOUD ) {",
         "            col = mix( col, mCol*lin*0.6, 0.3);",
         "        } else {",
-        "            // atmospheric",
+        "            // atmospheric haze",
         "            col = mCol*lin*0.2;",
-        "            //col = mix( mCol*lin*0.2, col, 1.0-exp(-0.0000000*t*t*t) );",
+        "            //col = mix( mCol*lin*0.2, col, clamp(exp(distance(vos, rayOrigin) * 0.01575 - 7.), 0., 1.) );",
         "        }",
         "    }",
 
-        "    // sepia lighting when looking into the sun",
-        "    //col += 0.2 * vec3(1.0,0.4,0.2) * pow( sun, 3.0 );",
-
-        "    // gamma",
-        "    col = pow( col, vec3(0.45) );",
+        "    col = pow( col, vec3(GAMMA) );",
 
         "    // contrast",
-        "    col = col* 0.25 + 0.75*col*col*(3.0-2.0*col);",
+        "    col = col * 0.15 + 0.85 * col * col * (3.0 - 2.0 * col);",
         "    col = clamp( col, 0.0, 1.0 );",
 
         "    // vignetting",
@@ -409,7 +412,7 @@
 "attributes":
     [ "aPosition" ],
 "uniforms":
-    [ "uCameraPos", "uCameraLookAt" ],
+    [ "uCameraPos", "uCameraLookAt", "uGlobalTime" ],
 "samplers":
     [ "uImageSampler" ]
 }
