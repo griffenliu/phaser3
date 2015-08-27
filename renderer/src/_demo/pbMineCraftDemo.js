@@ -124,7 +124,7 @@ function pbMineCraftDemo( docId )
 	this.keyRight = false;
 
 	this.camera = new Camera();
-	this.camera.create(0, 0, -10, 0, -10.1, 1);
+	this.camera.create(0, 0, -10, 0, 0.0, 1);
 
 	this.phaserRender = new pbPhaserRender( docId );
 	this.phaserRender.create( 'webgl', this.create, this.update, this );
