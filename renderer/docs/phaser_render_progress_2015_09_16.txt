@@ -1,0 +1,117 @@
+Phaser 3 renderer progress.
+2015-09-16
+
+The WIP can be found here: https://github.com/photonstorm/phaser3/tree/master/renderer
+A recent online demo is here: http://www.insanehero.com/html/renderer/src/
+The project commit log is here: https://github.com/photonstorm/phaser3/commits?author=pjbaron
+
+The phaser-sans-pixi fork is here: https://github.com/pjbaron/phaser
+The phaser and new renderer branch is here: https://github.com/pjbaron/phaser/tree/new_renderer
+
+20th, 21st, 24th, 25th, 26th, 27th August, 8th, 10th, 11th, 14th, 15th, 16th September
+
+This update:
+
+In order to put the new renderer into Phaser 2.x I've already removed all PIXI references, the next step which I'm just starting is to merge classes and/or extend phaser classes with the new renderer pieces.  I decided to start at the core of things with Phaser.Sprite.
+After a lot of mucking about, I eventually managed to get the phaser_examples to run locally using the modified phaser_sans_pixi version.  The trick is in config.php to change $config_phaser_path = '../../phaser_sans_pixi'; and to run the examples using localhost/phaser_examples/examples/debug.php  This should hopefully enable me to convert Phaser code to run the simplest examples with the ability to debug errors as they occur in the browser.  It is also helpful in Chrome to disable cacheing via debug panel | Network | Disable cache (checkbox).
+Fixed a sticking point in pbPhaserRender where it's created by Phaser.Game.setUpRenderer. pbPhaserRender was designed to allow loading to complete and didn't finish it's initialisation until the first call of pbPhaserRender.update from the RAF timer... had to review a big chunk of the renderer code to make it fit the Phaser requirements and blow away a lot of delayed action and event driven code.  This version of the renderer is now entirely dependent on Phaser's initialisation and boot sequence and no longer carries all that duplicated functionality.  During this process I removed some true global variables and fit them into a 'pb' namespace which touched a bunch of files.
+Remove references to children from Phaser.Image this is all handled by pbTransformObject in the new system.  Further changes to Phaser.Sprite and pbSprite/pbSurface/pbTransform to make them fit together with currently unsupported features gaining placeholder methods for now.  Changed Phaser.AnimationManager to set the pbBaseImage.cellFrame to the current frame index value.  Modified pbSprite and Phaser.Sprite to use the Phaser.Cache instead of the deprecated pbLoader/pbTextures objects.  Access to Phaser.Cache appears to rely on a 'game' object which is heavily passed through most of Phaser... suggest revisiting this and changing things like Cache into a singleton pattern with global access.  I've always disliked needing to pass an object through a long call stack because one distant child requires it's members.
+Started to merge Phaser.Group with pbTransformObject.  This might need to use pbBaseLayer instead, but currently the transform object seems closer to the previous PIXI.DisplayObjectContainer super class.
+This process is going to take quite a while and is very fiddly, please see the commit messages on the phaser_sans_pixi repo for full details... I'm just going to summarise very briefly here from now on.
+Attempting to merge pbWebGlLayer and pbBaseLayer with pbRenderer, Phaser.World and Phaser.Group.  It doesn't make sense to have two tree traversals so I want to get it all working inside the Phaser tree.
+Took a little time out from this boring job to do something fun - I found a shadertoy which does MineCraft style drawing on the GPU so I've converted it to the Phaser format and embedded it in a small demo with a manual camera control and using grey-shaded height maps of islands instead of procedurally generating them.
+
+Back from holidays... feeling refreshed and eager to make progress!
+
+A couple of minor tweaks got the Basic 01 demo working with the new renderer (load an image).
+Basic 02 (click on an image) uses input handlers, I had to fudge some code because the new renderer doesn't yet support some simple features like detecting if a location is inside the sprite or not.
+Basic 02 also uses the Phaser.Text object.  In 2.2.0 Phaser.Text extends PIXI.Text, however if I update my working shell to 2.4.X Rich tells me that the current Phaser.Text does not extend any PIXI features.
+TODO: save the transform stack coordinates at each level of pbTransformObject/pbBaseLayer so that the 'screen position' is available as well as the current 'global position'.
+NOTE: alternative to saving transform stack coordinates: apply input 'requests' through the transform stack and resolve them afterwards.  This will increase the accuracy of pixel perfect collisions on scaled sprites because it will always refer to the unscaled source images.  It's also a really elegant way of handling input which doesn't involve carrying around a ton of (possibly out of date) collision zones.
+
+Time to merge my 2.2.0 version of Phaser and take all my modifications into a clone of the current Phaser dev head.  This will be a big job but it's totally worth it as 2.4.4 will be the basis from which Phaser 3.0 is built.
+Started work on the merge.  I'm using diffmerge to compare 'phaser sans pixi' with the phaser dev branch, whilst using smartgit to find all the commits I made to the old phaser sans pixi files ripping out PIXI and bending things to fit with the new renderer.  Hopefully this double edged approach will reduce the number of errors at the end of this task!
+Some notes/reminders from the merge process:
+I believe that World.js can be deprecated along with Stage because rootLayer encompasses both... need to verify after this merge is complete.  POST-MERGE NOTE: no it can't, I deprecated Stage instead and kept World.
+RenderTexture.js needs more work.
+InputHandler.js requires pbSprite to have left/right/top/bottom/offsetX and offsetY
+LoaderParser.js references PIXI.BaseTexture multiple times
+Thought I'd finished the merge process then while recreating the PJBNOTE.txt file listing the notes and corresponding PIXI lines I found a bunch of bits that I'd somehow missed.
+Got that done, tried to run an example, and immediately discovered that my diffmerge program defaults to *not showing missing files*!  I wonder who designs these programs? ;)  Now I have to find all the missing files, copy them in, then do the original PIXI elimination for those too.
+File list as I copy them in: /creatures/*, core/Create.js, gameobjects/components/*, gameobjects/Creature.js, gameobjects/Video.js, geom/Matrix.js, geom/RoundedRectangle.js, input/DeviceButton.js, physics/arcade/TilemapCollision.js, polyfills.js, stubs/*, tilemap/ImageCollection.js, tween/TweenData.js, utils/ArraySet.js, utils/ArrayUtils.js, utils/LinkedList.js
+Some files have been removed too: core/ArrayList.js, core/LinkedList.js, gameobjects/Events.js, input/GamepadButton.js
+First four "Basics" examples are now working, so the 'merge' is complete.
+
+Moving on with the original task... bend Phaser and the new renderer to work together.
+Changing the animation system to fit with the new renderer.  I'm trying to keep the basic Phaser API to minimise code impact on examples and other projects... it might not be possible to do this neatly.  To start with I'm not worried about neatness, just trying to get things working then we'll take a look at all the new TODO items I'm adding at the bottom of this document.
+"Basics: load an animation" is now working.  I decided to leave Phaser alone as much as possible, so we're currently carrying a ton of information in each Frame object that simply isn't used.  The only value from that structure which is used by the new renderer is the frameIndex which gets stuck into cellFrame to perform the animation in this example.
+
+
+
+
+Coming soon / TODO:
+
+Replace all sprite.texture references with the correct option from sprite.surface and sprite.image
+Deprecate Phaser.Frame if possible, pbSurface, pbImage and the simple cellFrame should theoretically perform all the same tasks.
+BitmapText needs to extend from new renderer.
+
+
+From Phaser:
+Tile maps in different formats (csv, json, cybernoid see sci fly.js) and more capable... src/tilemaps.  Optimise for webgl to avoid huge textures.  
+Grab the Frames class and use it for more advanced texture atlas handling.
+Support TexturePacker atlasses which use multiple images with one json file.
+
+
+SpriteDLight:
+Calculate a normal map and graphic for a 'perfect' sphere and plug it into the balls demo.
+Make a 'snooker' demo with really high quality balls.
+Set up a rendering pipeline/new shader to use the position of pbSprites to get the lighting offsets, yet render them to rttTextures and feed those to the pbSprite.
+Add occlusion to the spriteDLight shader (create new shaders so user has all options available).
+
+Modify pbSprite to accept the output from user shaders == Add capability for sprites to use the render-to-texture as a source but otherwise display as currently.
+
+Canvas:
+Fix all canvas demos (they got left behind during the recent API changes).
+Improve canvas implementation to use faster, cleaner classes and interfaces.
+
+New functions:
+Provide api function to permit async processing before allLoaded fires (Timer?)... for preloaders etc.
+Add API to simplify drawing to the texture.
+
+Alterations:
+Sort out preUpdate, update and postUpdate via the pbTransformObject display list.  In particular work out how to separate logic from rendering to fit the expectations of Phaser.Game.updateLogic and Phaser.Game.updateRender.
+
+Alternate panning system: apply offsets to immediate children of any pbTransformObject.  Or maybe a whole separate transform?  This turns any layer into a camera capable of panning (zooming/rotating if transform).
+
+Make texture dictionary handle GPU textures transparently to pbSurface etc. Assign a key when adding it then forget about the source.
+Try to find alternative to setting gl.viewport to the texture size... it requires everything else to be scaled by (screen size / texture size) to draw at the correct sizes.
+
+Update rttCamera and/or multiCamera demo to use new rtt sprites.
+
+Integrate the 'creature' drawing tricks into the primary render system with a few new API calls and a "drawing queue" system to allow the user to schedule a complicated series of drawings and system changes.
+
+The bump shader needs to handle different bump textures for different tiles... probably the best way to do this is to have a bump texture which parallels the tile texture (all tiles in the same positions in both textures).  I need to decide if I want bump mapping for wall tops (currently when it's on top of a wall it's using a flat shader for the lighting effect over-spill).
+
+The bump shader needs some work to permit a tile-map of different bump textures, currently it just tiles a single one for the whole ground area.
+
+Explore replacing the current "super" implementation with simple prototype declarations... for derived classes specify exactly and only the functions that are derived using the prototype syntax... is it possible to call super functions this way?  If this can work it'll reduce call overhead in the crucial drawing stack loops considerably.
+
+New Demos:
+Make a more impressive render-to-texture sprite demo... the distinguishing feature of this ability is the pre-render (otherwise it's just like cameras again... only transparent backgrounds ie. sprites...)  Maybe extend the rtt camera demo to use sprites??
+
+External tools and utilities:
+Test the demos in Cocoon.
+Add modification tools to the bump map editor so it's possible to edit the pseudo-3D image of the bump surface and generate the bump data image.  Extend the bump map editor to use the 'b' colour component to carry further information (height or reflectivity) to improve the power of this approach.  Carry those changes over into the shader code.
+
+Research:
+Look into "how to build shaders dynamically" (find a good structure) so we can have several shader effects in a single shader program and avoid the overhead of running them sequentially.  Take a closer look at "ShaderFrog" to verify if it's using the 'bouncing texture' approach or is building shaders the way I'd like to.
+
+Bugs:
+Fix the in-game bump shader (it's still shading the vertical component reversed - already fixed in the editor c# code).
+
+TODO:
+Find all 'TODO' code and commit comments and: make a full list in one place; prioritise the list; start knocking things off until it's all dealt with.
+Address all PJBNOTE comments in the Phaser source code where PIXI references have been removed, by modifying Phaser or the new renderer (or both) to work together.
+
+- Pete
+
