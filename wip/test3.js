@@ -1,4 +1,4 @@
-import Line from 'Line.js';
+import Line from 'geom/Line.js';
 
 let bob = new Line(100, 100, 400, 300);
 
