@@ -33,14 +33,7 @@ export default class BaseLoader {
 
     }
 
-    addFile(file) {
-
-        //  It's a Set so it won't allow multiple identical objects
-        this.list.add(file);
-
-    }
-
-    start() {
+    start () {
 
         if (this.isLoading)
         {
@@ -57,6 +50,8 @@ export default class BaseLoader {
             this.hasLoaded = false;
             this.isLoading = true;
 
+            this.queue.clear();
+
             // this.updateProgress();
 
             this.processLoadQueue();
@@ -64,7 +59,7 @@ export default class BaseLoader {
 
     }
 
-    processLoadQueue() {
+    processLoadQueue () {
 
         if (!this.isLoading)
         {
@@ -92,17 +87,36 @@ export default class BaseLoader {
 
     }
 
-    loadFile(file) {
-
-        console.log('BaseLoader.loadFile');
+    loadFile (file) {
 
         file.load();
 
     }
 
-    getURL(file) {
+    nextFile () {
 
-        console.log('getURL', file);
+        if (this.list.size > 0)
+        {
+            this.processLoadQueue();
+        }
+        else
+        {
+            //  Check the queue is clear
+            for (let file of this.queue)
+            {
+                if (file.loading)
+                {
+                    //  If anything is still loading we bail out
+                    return;
+                }
+            }
+
+            this.finishedLoading();
+        }
+
+    }
+
+    getURL (file) {
 
         if (!file.url)
         {
@@ -118,12 +132,45 @@ export default class BaseLoader {
             return this.baseURL + file.path + file.url;
         }
 
-        console.log('getURL OVER');
-
     }
     
-    finishedLoading() {
+    finishedLoading () {
+
         console.log('finishedLoading');
+
+        //  process all the files
+        for (let file of this.queue)
+        {
+            if (file.parent)
+            {
+                file.parent.process();
+            }
+            else
+            {
+                file.process();
+            }
+        }
+
+    }
+
+    xhrLoad (file) {
+
+        console.log('xhrLoad', file.src);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", file.src, true);
+        xhr.responseType = file.type;
+
+        xhr.onload = () => {
+            file.complete(xhr);
+        };
+
+        xhr.onerror = () => {
+            file.error(xhr);
+        };
+
+        xhr.send();
+
     }
 
 }

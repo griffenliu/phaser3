@@ -2,9 +2,9 @@ import Loader from 'loader/Loader.js';
 
 let loader = new Loader();
 
-var img = loader.image('logo', 'assets/phaser1.png');
+loader.path = 'assets/';
 
-console.log(loader.list);
+loader.atlas('invaderpig');
 
 loader.start();
 
