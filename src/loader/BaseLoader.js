@@ -27,7 +27,7 @@ export default class BaseLoader {
         this.queue = new Set();
 
         // this._processingHead = 0;
-        this._fileLoadStarted = false;
+        // this._fileLoadStarted = false;
         // this._totalFileCount = 0;
         // this._loadedFileCount = 0;
 
@@ -136,7 +136,7 @@ export default class BaseLoader {
     
     finishedLoading () {
 
-        console.log('finishedLoading');
+        console.log('finishedLoading, about to start processing');
 
         //  process all the files
         for (let file of this.queue)
@@ -158,7 +158,7 @@ export default class BaseLoader {
         console.log('xhrLoad', file.src);
 
         let xhr = new XMLHttpRequest();
-        xhr.open("GET", file.src, true);
+        xhr.open('GET', file.src, true);
         xhr.responseType = file.type;
 
         xhr.onload = () => {
@@ -182,12 +182,11 @@ export default class BaseLoader {
             if (window['DOMParser'])
             {
                 var domparser = new DOMParser();
-                xml = domparser.parseFromString(data, "text/xml");
+                xml = domparser.parseFromString(data, 'text/xml');
             }
             else
             {
-                xml = new ActiveXObject("Microsoft.XMLDOM");
-                // xml.async = 'false';
+                xml = new ActiveXObject('Microsoft.XMLDOM');
                 xml.loadXML(data);
             }
         }
@@ -196,7 +195,7 @@ export default class BaseLoader {
             xml = null;
         }
 
-        if (!xml || !xml.documentElement || xml.getElementsByTagName("parsererror").length)
+        if (!xml || !xml.documentElement || xml.getElementsByTagName('parsererror').length)
         {
             return null;
         }
@@ -208,4 +207,3 @@ export default class BaseLoader {
     }
 
 }
-

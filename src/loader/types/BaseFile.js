@@ -7,7 +7,7 @@ export default class BaseFile {
 
         if (key === undefined || key === '')
         {
-            console.warn("Phaser.Loader: Invalid or no key given of type " + type);
+            console.warn('Phaser.Loader: Invalid key given');
             return this;
         }
 
@@ -25,14 +25,20 @@ export default class BaseFile {
 
         this.linkFile = null;
 
-        // this.syncPoint = loader._withSyncPointDepth > 0;
         this.data = null;
+
+        this.onstatechange = null;
 
         this.customLoad = false;
 
-        this.loading = false;
-        this.loaded = false;
-        this.failed = false;
+        //  _sigh_ no static class properties in ES6, just static methods
+        this.PENDING = 0;
+        this.LOADING = 1;
+        this.LOADED = 2;
+        this.FAILED = 3;
+        this.DESTROYED = 4;
+
+        this._state = 0;
 
     }
 
@@ -53,16 +59,29 @@ export default class BaseFile {
 
     add () {
 
-        //  Add itself to the Loaders list
-
         //  It's a Set so it won't allow multiple identical objects
         this.loader.list.add(this);
+
+        return new Promise(
+            (resolve, reject) => {
+                this.onstatechange = function () {
+                    if (this.state === this.LOADED)
+                    {
+                        resolve(this);
+                    }
+                    else if (this.state == this.FAILED)
+                    {
+                        reject(this);
+                    }
+                }
+            }
+        );
 
     }
 
     load () {
 
-        this.loading = true;
+        this.state = this.LOADING;
 
         this.src = this.loader.getURL(this);
 
@@ -75,11 +94,9 @@ export default class BaseFile {
 
     }
 
-    //  load completed with no errors
     complete (data = null) {
 
-        this.loading = false;
-        this.loaded = true;
+        this.state = this.LOADED;
 
         if (data)
         {
@@ -92,15 +109,35 @@ export default class BaseFile {
 
     }
 
-    //  load completed with errors
     error () {
 
-        this.loading = false;
-        this.failed = true;
+        this.state = this.FAILED;
 
         console.log('BaseFile.error', this.key);
 
         this.loader.nextFile();
+
+    }
+
+    get state () {
+
+        return this._state;
+
+    }
+
+    set state (value) {
+
+        if (this._state !== value)
+        {
+            this._state = value;
+            this.onstatechange(this);
+        }
+
+    }
+
+    get loading () {
+
+        return (this._state === this.LOADING);
 
     }
 
@@ -117,6 +154,8 @@ export default class BaseFile {
         this.parent = null;
         this.linkFile = null;
         this.data = null;
+
+        this.state = this.DESTROYED;
 
     }
     

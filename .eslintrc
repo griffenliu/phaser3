@@ -1,18 +1,32 @@
 {
-  "globals": {
-    // Put things like jQuery, etc
-    "jQuery": true,
-    "$": true
-  },
-  "env": {
-    // I write for browser
-    "browser": true,
-    // in CommonJS
-    "node": false
-  },
-  // To give you an idea how to override rule options:
-  "rules": {
-    // Tons of rules you can use, for example...
-    "quotes": [1, "single"]
-  }
+    "globals": {
+        "jQuery": true
+    },
+    "env": {
+        "browser": true,
+        "node": false,
+        "es6": true
+    },
+    "ecmaFeatures": {
+        "arrowFunctions": true,
+        "binaryLiterals": true,
+        "blockBindings": true,
+        "classes": true,
+        "defaultParams": true,
+        "destructuring": true,
+        "forOf": true,
+        "generators": true,
+        "modules": true,
+        "spread": true,
+        "jsx": true
+    },
+    "parser": "babel-eslint",
+    "rules": {
+        "brace-style": [2, "allman", { "allowSingleLine": true }],
+        "comma-dangle": [2, "never"],
+        "comma-spacing": [2, {"before": false, "after": true}],
+        "comma-style": [2, "last"],
+        "camelcase": [2, {"properties": "always"}],
+        "quotes": [1, "single"]
+    }
 }

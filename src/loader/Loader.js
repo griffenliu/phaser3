@@ -9,6 +9,12 @@ import BinaryFile from 'loader/types/BinaryFile.js';
 import AtlasJSONFile from 'loader/types/AtlasJSONFile.js';
 import AtlasXMLFile from 'loader/types/AtlasXMLFile.js';
 
+/**
+ * TODO:
+ *
+ * + Allow a way to specify which Cache a file is added to when processed
+ * 
+ */
 export default class Loader extends BaseLoader {
 
     constructor (game) {
@@ -19,11 +25,7 @@ export default class Loader extends BaseLoader {
 
     image (key, url = '') {
 
-        let file = new ImageFile(this, key, url);
-
-        file.add();
-
-        return this;
+        return new ImageFile(this, key, url).add();
 
     }
  
@@ -50,71 +52,43 @@ export default class Loader extends BaseLoader {
 
     json (key, url = '') {
 
-        let file = new JSONFile(this, key, url);
-
-        file.add();
-
-        return this;
+        return new JSONFile(this, key, url).add();
 
     }
 
     text (key, url = '') {
 
-        let file = new TextFile(this, key, url);
-
-        file.add();
-
-        return this;
+        return new TextFile(this, key, url).add();
 
     }
 
     shader (key, url = '') {
 
-        let file = new ShaderFile(this, key, url);
-
-        file.add();
-
-        return this;
+        return new ShaderFile(this, key, url).add();
 
     }
 
     xml (key, url = '') {
 
-        let file = new XMLFile(this, key, url);
-
-        file.add();
-
-        return this;
+        return new XMLFile(this, key, url).add();
 
     }
 
     binary (key, url = '', callback = null) {
 
-        let file = new BinaryFile(this, key, url, callback);
-
-        file.add();
-
-        return this;
+        return new BinaryFile(this, key, url, callback).add();
 
     }
 
     atlas (key, textureURL = '', atlasURL = '', atlasData = null) {
 
-        let file = new AtlasJSONFile(this, key, textureURL, atlasURL, atlasData);
-
-        file.add();
-
-        return this;
+        return new AtlasJSONFile(this, key, textureURL, atlasURL, atlasData).add();
 
     }
 
     atlasXML (key, textureURL = '', atlasURL = '', atlasData = null) {
 
-        let file = new AtlasXMLFile(this, key, textureURL, atlasURL, atlasData);
-
-        file.add();
-
-        return this;
+        return new AtlasXMLFile(this, key, textureURL, atlasURL, atlasData).add();
 
     }
 
