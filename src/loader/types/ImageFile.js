@@ -4,12 +4,14 @@ export default class ImageFile extends BaseFile {
 
     constructor (loader, key, url) {
 
-        super(loader, key, url);
-
         if (url === '')
         {
-            this.url = key + '.png';
+            url = key + '.png';
         }
+
+        super(loader, key, url);
+
+        this.customLoad = true;
 
     }
 

@@ -1,19 +1,17 @@
 import BaseFile from 'loader/types/BaseFile.js';
 
-export default class JSONFile extends BaseFile {
+export default class TextFile extends BaseFile {
 
     constructor (loader, key, url = '', data = null) {
 
         if (url === '' && !data)
         {
-            url = key + '.json';
+            url = key + '.txt';
         }
 
         super(loader, key, url);
 
         this.type = 'text';
-
-        this.json = null;
 
         if (data)
         {
@@ -33,10 +31,7 @@ export default class JSONFile extends BaseFile {
 
         super.process();
 
-        //  try / catch?
-        this.json = JSON.parse(this.data);
-
-        console.log(this.json);
+        console.log(this.data);
 
     }
 

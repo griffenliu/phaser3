@@ -1,19 +1,19 @@
 import BaseFile from 'loader/types/BaseFile.js';
 
-export default class JSONFile extends BaseFile {
+export default class XMLFile extends BaseFile {
 
     constructor (loader, key, url = '', data = null) {
 
         if (url === '' && !data)
         {
-            url = key + '.json';
+            url = key + '.xml';
         }
 
         super(loader, key, url);
 
         this.type = 'text';
 
-        this.json = null;
+        this.xml = null;
 
         if (data)
         {
@@ -33,10 +33,14 @@ export default class JSONFile extends BaseFile {
 
         super.process();
 
-        //  try / catch?
-        this.json = JSON.parse(this.data);
+        this.xml = this.loader.parseXml(this.data);
 
-        console.log(this.json);
+        if (!this.xml)
+        {
+            throw new Error("Phaser.Loader.XMLFile: Invalid XML");
+        }
+
+        console.log(this.xml);
 
     }
 

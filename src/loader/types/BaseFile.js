@@ -28,6 +28,8 @@ export default class BaseFile {
         // this.syncPoint = loader._withSyncPointDepth > 0;
         this.data = null;
 
+        this.customLoad = false;
+
         this.loading = false;
         this.loaded = false;
         this.failed = false;
@@ -60,21 +62,26 @@ export default class BaseFile {
 
     load () {
 
-        console.log('BaseFile.load', this.url);
-
         this.loading = true;
 
         this.src = this.loader.getURL(this);
 
+        console.log('BaseFile.load', this.src);
+
+        if (!this.customLoad)
+        {
+            this.loader.xhrLoad(this);
+        }
+
     }
 
     //  load completed with no errors
-    complete (data = '') {
+    complete (data = null) {
 
         this.loading = false;
         this.loaded = true;
 
-        if (data !== '')
+        if (data)
         {
             this.data = data;
         }
