@@ -27,7 +27,7 @@ export default class BaseFile {
 
         this.data = null;
 
-        this.onstatechange = null;
+        this.onStateChange = null;
 
         this.customLoad = false;
 
@@ -64,7 +64,7 @@ export default class BaseFile {
 
         return new Promise(
             (resolve, reject) => {
-                this.onstatechange = function () {
+                this.onStateChange = function () {
                     if (this.state === this.LOADED)
                     {
                         resolve(this);
@@ -81,29 +81,25 @@ export default class BaseFile {
 
     load () {
 
-        this.state = this.LOADING;
-
         this.src = this.loader.getURL(this);
-
-        console.log('BaseFile.load', this.src);
 
         if (!this.customLoad)
         {
             this.loader.xhrLoad(this);
         }
 
+        this.state = this.LOADING;
+
     }
 
     complete (data = null) {
-
-        this.state = this.LOADED;
 
         if (data)
         {
             this.data = data;
         }
 
-        console.log('BaseFile.complete', this.url);
+        this.state = this.LOADED;
 
         this.loader.nextFile();
 
@@ -112,8 +108,6 @@ export default class BaseFile {
     error () {
 
         this.state = this.FAILED;
-
-        console.log('BaseFile.error', this.key);
 
         this.loader.nextFile();
 
@@ -130,7 +124,7 @@ export default class BaseFile {
         if (this._state !== value)
         {
             this._state = value;
-            this.onstatechange(this);
+            this.onStateChange(this);
         }
 
     }

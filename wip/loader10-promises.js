@@ -18,7 +18,7 @@ export default class LoaderTest {
 
     fileLoaded (file) {
 
-        console.log('File loaded!!!', file.key);
+        console.log('The Mushroom loaded!');
 
     }
 
