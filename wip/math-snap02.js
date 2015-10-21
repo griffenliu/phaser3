@@ -11,3 +11,5 @@ console.log(math.snap.floor(9, 5));
 
 //  Should snap to 15
 console.log(math.snap.ceil(11, 5));
+
+window.pmath = math;
