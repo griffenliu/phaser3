@@ -31,13 +31,6 @@ export default class BaseFile {
 
         this.customLoad = false;
 
-        //  _sigh_ no static class properties in ES6, just static methods
-        this.PENDING = 0;
-        this.LOADING = 1;
-        this.LOADED = 2;
-        this.FAILED = 3;
-        this.DESTROYED = 4;
-
         this._state = 0;
 
     }
@@ -65,11 +58,11 @@ export default class BaseFile {
         return new Promise(
             (resolve, reject) => {
                 this.onStateChange = function () {
-                    if (this.state === this.LOADED)
+                    if (this.state === BaseFile.LOADED)
                     {
                         resolve(this);
                     }
-                    else if (this.state == this.FAILED)
+                    else if (this.state == BaseFile.FAILED)
                     {
                         reject(this);
                     }
@@ -88,7 +81,7 @@ export default class BaseFile {
             this.loader.xhrLoad(this);
         }
 
-        this.state = this.LOADING;
+        this.state = BaseFile.LOADING;
 
     }
 
@@ -99,7 +92,7 @@ export default class BaseFile {
             this.data = data;
         }
 
-        this.state = this.LOADED;
+        this.state = BaseFile.LOADED;
 
         this.loader.nextFile();
 
@@ -107,7 +100,7 @@ export default class BaseFile {
 
     error () {
 
-        this.state = this.FAILED;
+        this.state = BaseFile.FAILED;
 
         this.loader.nextFile();
 
@@ -131,7 +124,7 @@ export default class BaseFile {
 
     get loading () {
 
-        return (this._state === this.LOADING);
+        return (this._state === BaseFile.LOADING);
 
     }
 
@@ -149,8 +142,16 @@ export default class BaseFile {
         this.linkFile = null;
         this.data = null;
 
-        this.state = this.DESTROYED;
+        this.state = BaseFile.DESTROYED;
 
     }
     
 }
+
+//  Class constants (because ES6 won't let us do it within the Class yet)
+
+BaseFile.PENDING = 0;
+BaseFile.LOADING = 1;
+BaseFile.LOADED = 2;
+BaseFile.FAILED = 3;
+BaseFile.DESTROYED = 4;
