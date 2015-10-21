@@ -17,14 +17,14 @@ export function greaterThan (a, b, epsilon = 0.0001) {
 
 }
 
-export function ceil (val, epsilon = 0.0001) {
+export function ceil (value, epsilon = 0.0001) {
 
-    return Math.ceil(val - epsilon);
+    return Math.ceil(value - epsilon);
 
 }
 
-export function floor (val, epsilon = 0.0001) {
+export function floor (value, epsilon = 0.0001) {
 
-    return Math.floor(val + epsilon);
+    return Math.floor(value + epsilon);
 
 }
