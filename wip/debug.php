@@ -14,7 +14,7 @@
     <style>
         body {
             font-family: sans-serif;
-            font-size: 16px;
+            font-size: 12px;
             margin: 16px;
         }
 
@@ -33,6 +33,8 @@
 <body>
 
     <h1 style="float: right; text-align: right">Phaser III<br />Test Runner</h1>
+
+    <div id="game"></div>
 
     <?php
         if ($file !== '')
