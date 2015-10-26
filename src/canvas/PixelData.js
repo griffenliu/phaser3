@@ -10,7 +10,7 @@ export default class PixelData {
 
         /**
         * A Uint8ClampedArray view into BitmapData.buffer.
-        * Note that this is unavailable in some browsers (such as Epic Browser due to its security restrictions)
+        * Note that this is unavailable in some browsers such as Epic Browser due to its security restrictions.
         * @property {Uint8ClampedArray} data
         */
         this.data = null;
@@ -30,9 +30,8 @@ export default class PixelData {
     }
 
     /**
-    * This re-creates the BitmapData.imageData from the current context.
+    * This re-creates the imageData from the current context.
     * It then re-builds the ArrayBuffer, the data Uint8ClampedArray reference and the pixels Int32Array.
-    * If not given the dimensions defaults to the full size of the context.
     */
     update () {
 
@@ -46,7 +45,7 @@ export default class PixelData {
         }
         else
         {
-            if (window['ArrayBuffer'])
+            if (window.ArrayBuffer)
             {
                 this.buffer = new ArrayBuffer(this.imageData.data.length);
                 this.pixels = new Uint32Array(this.buffer);
