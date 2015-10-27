@@ -11,6 +11,20 @@ export default class MasterClock {
 
     constructor () {
 
+        this.getTime = Date.now;
+
+        if (window.performance)
+        {
+            if (window.performance.now)
+            {
+                this.getTime = () => { return window.performance.now };
+            }
+            else if (window.performance.webkitNow)
+            {
+                this.getTime = () => { return window.performance.webkitNow };
+            }
+        }
+
         /**
         * The `performance.now()` value when the time was last updated.
         * @property {float} time
@@ -41,7 +55,7 @@ export default class MasterClock {
 
         this._startTime = 0;
 
-        this.updateCallback = null;
+        this.callback = null;
 
         this.clocks = new Set();
 
@@ -49,11 +63,11 @@ export default class MasterClock {
 
     init (callback) {
 
-        this.time = performance.now();
+        this.time = this.getTime();
 
-        this._startTime = performance.now();
+        this._startTime = this.time;
 
-        this.updateCallback = callback;
+        this.callback = callback;
 
         window.requestAnimationFrame(now => this.step(now));
 
@@ -70,18 +84,18 @@ export default class MasterClock {
 
         for (const clock of this.clocks)
         {
-            clock.step(this);
+            clock.step(this.elapsed);
         }
 
-        this.updateCallback();
+        this.callback();
 
         window.requestAnimationFrame(now => this.step(now));
 
     }
 
-    add (clock) {
+    add (tickSize = 0) {
 
-        let clock = new Clock(this);
+        let clock = new Clock(this, tickSize);
 
         this.clocks.add(clock);
 
