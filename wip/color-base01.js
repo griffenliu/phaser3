@@ -1,6 +1,6 @@
 import Color from 'graphics/color/BaseColor.js';
 
-var red = new Color(255);
+let red = new Color(255);
 
 //  Default is the # prefix
 console.log(red.toString());
