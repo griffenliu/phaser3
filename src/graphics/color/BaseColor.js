@@ -16,9 +16,7 @@ export default class BaseColor {
         this.b = blue;
         this.a = alpha;
 
-        // this.hue = 0;
-        // this.saturation = 0;
-        // this.luminosity = 1;
+        this.gl = new Float32Array([ 0.0, 0.0, 0.0, 1.0 ]);
 
         this.color = 0;
         this.color32 = 0;
@@ -50,6 +48,8 @@ export default class BaseColor {
 
         this.r = Math.min(value, 255);
 
+        this.gl[0] = this.r / 255;
+
     }
 
     set green (value) {
@@ -57,6 +57,8 @@ export default class BaseColor {
         value = Math.floor(Math.abs(value));
 
         this.g = Math.min(value, 255);
+
+        this.gl[1] = this.g / 255;
 
     }
 
@@ -66,6 +68,8 @@ export default class BaseColor {
 
         this.b = Math.min(value, 255);
 
+        this.gl[2] = this.b / 255;
+
     }
 
     set alpha (value) {
@@ -73,6 +77,8 @@ export default class BaseColor {
         value = Math.floor(Math.abs(value));
 
         this.a = Math.min(value, 255);
+
+        this.gl[3] = this.a / 255;
 
     }
 
@@ -186,13 +192,47 @@ export default class BaseColor {
 
     }
 
+    copyFrom (color) {
+
+        return this.setRGB(color.r, color.g, color.b, color.a);
+
+    }
+
+    copyTo (color) {
+
+        return color.setRGB(this.r, this.g, this.b, this.a);
+
+    }
+
+    equals (color) {
+
+        return (
+            (this.r === color.r) &&
+            (this.g === color.g) &&
+            (this.b === color.b) &&
+            (this.a === color.a)
+        );
+
+    }
+
     update () {
 
         this.color = GetColor(this.r, this.g, this.b);
         this.color32 = GetColor32(this.r, this.g, this.b, this.a);
         this.rgba = `rgba(${this.r}, ${this.g}, ${this.b}, ${255 / this.a})`;
 
+        this.gl[0] = this.r / 255;
+        this.gl[1] = this.g / 255;
+        this.gl[2] = this.b / 255;
+        this.gl[3] = this.a / 255;
+
         return this;
+
+    }
+
+    toGL () {
+
+        return this.gl;
 
     }
 
