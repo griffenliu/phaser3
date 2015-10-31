@@ -5,6 +5,7 @@ import HSVtoRGB from 'graphics/color/HSVtoRGB.js';
 import HSLtoRGB from 'graphics/color/HSLtoRGB.js';
 import RandomRGB from 'graphics/color/RandomRGB.js';
 import ColorToRGB from 'graphics/color/ColorToRGB.js';
+import * as LinearInterpolation from 'graphics/color/LinearInterpolation.js';
 
 export default class BaseColor {
 
@@ -158,6 +159,22 @@ export default class BaseColor {
         c = Math.min(Math.abs(c), 359) / 359;
 
         let { r, g, b } = HSLtoRGB(c, s, l);
+
+        return this.fromRGB(r, g, b);
+
+    }
+
+    fromInterpolation (color1, color2, length, index) {
+
+        let { r, g, b } = LinearInterpolation.colorWithColor(color1, color2, length, index);
+
+        return this.fromRGB(r, g, b);
+
+    }
+
+    interpolateWith (color, length, index) {
+
+        let { r, g, b } = LinearInterpolation.colorWithColor(this, color, length, index);
 
         return this.fromRGB(r, g, b);
 
