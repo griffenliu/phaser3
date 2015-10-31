@@ -16,6 +16,6 @@ export default function (v, k) {
         return Linear(v[m], v[m - 1], m - f);
     }
 
-    return Linear(v[i], v[i + 1 > m ? m : i + 1], f - i);
+    return Linear(v[i], v[(i + 1 > m) ? m : i + 1], f - i);
 
 }

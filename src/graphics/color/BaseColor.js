@@ -1,7 +1,10 @@
 import GetColor from 'graphics/color/GetColor.js';
 import GetColor32 from 'graphics/color/GetColor32.js';
 import RGBtoString from 'graphics/color/RGBtoString.js';
-import HueToColor from 'graphics/color/HueToColor.js';
+import HSVtoRGB from 'graphics/color/HSVtoRGB.js';
+import HSLtoRGB from 'graphics/color/HSLtoRGB.js';
+import RandomRGB from 'graphics/color/RandomRGB.js';
+import ColorToRGB from 'graphics/color/ColorToRGB.js';
 
 export default class BaseColor {
 
@@ -12,9 +15,9 @@ export default class BaseColor {
         this.b = blue;
         this.a = alpha;
 
-        this.hue = 0;
-        this.saturation = 0;
-        this.luminosity = 1;
+        // this.hue = 0;
+        // this.saturation = 0;
+        // this.luminosity = 1;
 
         this.color = 0;
         this.color32 = 0;
@@ -72,6 +75,19 @@ export default class BaseColor {
 
     }
 
+    //  Assumes all values are valid and within range (0 - 255)
+    setRGB (r, g, b, a = 255) {
+
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+
+        return this.update();
+
+    }
+
+    //  Same as setRGB but performs safety checks on all the values given
     fromRGB (r, g, b, a = 255) {
 
         this.red = r;
@@ -85,30 +101,17 @@ export default class BaseColor {
 
     fromColor (color) {
 
-        if (color > 16777215)
-        {
-            this.a = color >>> 24;
-        }
-        else
-        {
-            this.a = 255;
-        }
+        let { r, g, b, a } = ColorToRGB(color);
 
-        this.r = color >> 16 & 0xFF;
-        this.g = color >> 8 & 0xFF;
-        this.b = color & 0xFF;
-
-        return this.update();
+        return this.setRGB(r, g, b, a);
 
     }
 
-    fromRandom (min = 0, max = 255, alpha = 255) {
+    fromRandom (min = 0, max = 255) {
 
-        this.red = min + Math.round(Math.random() * (max - min));
-        this.green = min + Math.round(Math.random() * (max - min));
-        this.blue = min + Math.round(Math.random() * (max - min));
+        let { r, g, b } = RandomRGB(min, max);
 
-        return this.update();
+        return this.setRGB(r, g, b);
 
     }
 
@@ -124,72 +127,39 @@ export default class BaseColor {
      * @param {number} v - The value, in the range 0 - 1.
      * @return {BaseColor} This
      */
-    fromHSV (h, s, v) {
+    fromHSV (h, s = 1, v = 1) {
 
-        const i = Math.floor(h * 6);
-        const f = h * 6 - i;
+        let { r, g, b } = HSVtoRGB(h, s, v);
 
-        const p = (v * (1 - s)) * 255;
-        const q = (v * (1 - f * s)) * 255;
-        const t = (v * (1 - (1 - f) * s)) * 255;
-
-        const r = i % 6;
-
-        v *= 255;
-
-        if (r === 0)
-        {
-            return this.fromRGB(v, t, p);
-        }
-        else if (r === 1)
-        {
-            return this.fromRGB(q, v, p);
-        }
-        else if (r === 2)
-        {
-            return this.fromRGB(p, v, t);
-        }
-        else if (r === 3)
-        {
-            return this.fromRGB(p, q, v);
-        }
-        else if (r === 4)
-        {
-            return this.fromRGB(t, p, v);
-        }
-        else if (r === 5)
-        {
-            return this.fromRGB(v, p, q);
-        }
+        return this.fromRGB(r, g, b);
 
     }
 
     fromHSVColorWheel (c = 0, s = 1, v = 1) {
 
-        c = Math.min(Math.abs(c), 359);
+        c = Math.min(Math.abs(c), 359) / 359;
 
-        return this.fromHSV(c / 359, s, v);
+        let { r, g, b } = HSVtoRGB(c, s, v);
+
+        return this.fromRGB(r, g, b);
 
     }
 
     fromHSL (h, s, l) {
 
-        // achromatic by default
-        const r = l;
-        const g = l;
-        const b = l;
+        let { r, g, b } = HSLtoRGB(h, s, l);
 
-        if (s !== 0)
-        {
-            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            const p = 2 * l - q;
+        return this.fromRGB(r, g, b);
 
-            r = HueToColor(p, q, h + 1 / 3);
-            g = HueToColor(p, q, h);
-            b = HueToColor(p, q, h - 1 / 3);
-        }
+    }
 
-        return this.fromRGB(r * 255, g * 255, b * 255);
+    fromHSLColorWheel (c = 0, s = 1, l = 0.5) {
+
+        c = Math.min(Math.abs(c), 359) / 359;
+
+        let { r, g, b } = HSLtoRGB(c, s, l);
+
+        return this.fromRGB(r, g, b);
 
     }
 
@@ -221,9 +191,9 @@ export default class BaseColor {
 
     }
 
-    static createFromRandom (min, max, alpha) {
+    static createRandom (min, max) {
 
-        return new BaseColor().fromRandom(min, max, alpha);
+        return new BaseColor().fromRandom(min, max);
 
     }
 

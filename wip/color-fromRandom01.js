@@ -12,9 +12,9 @@ AddToDOM(canvas, 'game');
 
 let ctx = canvas.getContext('2d');
 
-let color1 = new Color.createFromRandom();
-let color2 = new Color.createFromRandom();
-let color3 = new Color.createFromRandom();
+let color1 = new Color.createRandom();
+let color2 = new Color.createRandom();
+let color3 = new Color.createRandom();
 
 console.log(color1);
 console.log(color2);
