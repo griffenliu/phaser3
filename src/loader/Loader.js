@@ -4,7 +4,7 @@ import ImageFile from 'loader/types/ImageFile.js';
 import JSONFile from 'loader/types/JSONFile.js';
 import XMLFile from 'loader/types/XMLFile.js';
 import TextFile from 'loader/types/TextFile.js';
-import ShaderFile from 'loader/types/ShaderFile.js';
+import GLSLFile from 'loader/types/GLSLFile.js';
 import BinaryFile from 'loader/types/BinaryFile.js';
 import AtlasJSONFile from 'loader/types/AtlasJSONFile.js';
 import AtlasXMLFile from 'loader/types/AtlasXMLFile.js';
@@ -62,9 +62,15 @@ export default class Loader extends BaseLoader {
 
     }
 
+    glsl (key, url = '') {
+
+        return new GLSLFile(this, key, url).add();
+
+    }
+
     shader (key, url = '') {
 
-        return new ShaderFile(this, key, url).add();
+        return new GLSLFile(this, key, url).add();
 
     }
 

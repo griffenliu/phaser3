@@ -1,12 +1,12 @@
 import BaseFile from 'loader/types/BaseFile.js';
 
-export default class ShaderFile extends BaseFile {
+export default class GLSLFile extends BaseFile {
 
     constructor (loader, key, url = '', data = null) {
 
         if (url === '' && !data)
         {
-            url = key + '.frag';
+            url = key + '.glsl';
         }
 
         super(loader, key, url);
