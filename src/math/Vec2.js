@@ -13,5 +13,11 @@ export default class Vec2 {
         this.y = y;
 
     }
+
+    equals (vec2) {
+
+        return (this.x === vec2.x && this.y === vec2.y);
+
+    }
     
 }
