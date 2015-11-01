@@ -103,7 +103,7 @@ export default class Rectangle {
     }
 
     get empty () {
-        return (this.width === 0 && this.height === 0)
+        return (this.width === 0 || this.height === 0)
     }
 
     set x (value) {
