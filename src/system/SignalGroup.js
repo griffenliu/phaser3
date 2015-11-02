@@ -21,6 +21,7 @@ export default class SignalGroup {
 
     }
 
+    //  Maybe should include a key? Otherwise your handler will have a tough time knowing which signal it's responding to.
     create () {
 
         let signal = new Signal();
