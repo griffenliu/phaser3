@@ -83,6 +83,8 @@ export default class Signal {
 
         for (let binding of this.callbacks.keys())
         {
+            let result = true;
+
             if (binding.active)
             {
                 result = binding.execute(args);
