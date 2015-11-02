@@ -1,7 +1,7 @@
 import Clock from 'time/Clock.js';
 import MasterClock from 'time/MasterClock.js';
 import Canvas from 'canvas/Canvas.js';
-import AddToDOM from 'canvas/AddToDOM.js';
+import AddToDOM from 'dom/AddToDOM.js';
 import BackgroundColor from 'canvas/BackgroundColor.js';
 
 export default class ClockTest {

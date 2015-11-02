@@ -1,4 +1,4 @@
-export default function (canvas, parent = null, overflowHidden = true) {
+export default function (element, parent = null, overflowHidden = true) {
 
     var target;
 
@@ -27,8 +27,8 @@ export default function (canvas, parent = null, overflowHidden = true) {
         target.style.overflow = 'hidden';
     }
 
-    target.appendChild(canvas);
+    target.appendChild(element);
 
-    return canvas;
+    return element;
 
 }

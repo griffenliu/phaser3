@@ -1,7 +1,7 @@
 import Color from 'graphics/color/BaseColor.js';
 
 import Canvas from 'canvas/Canvas.js';
-import AddToDOM from 'canvas/AddToDOM.js';
+import AddToDOM from 'dom/AddToDOM.js';
 import BackgroundColor from 'canvas/BackgroundColor.js';
 
 let canvas = Canvas(512, 640);
