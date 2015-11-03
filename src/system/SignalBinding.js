@@ -1,6 +1,6 @@
 export default class SignalBinding {
 
-    constructor (signal, listener, isOnce = false, priority = 0, args = []) {
+    constructor (signal, listener, isOnce = false, args = []) {
 
         this.signal = signal;
 
@@ -8,11 +8,7 @@ export default class SignalBinding {
 
         this.isOnce = isOnce;
 
-        this.priority = priority;
-
         this.args = args;
-
-        this.callCount = 0;
 
         this.active = true;
 
@@ -20,10 +16,7 @@ export default class SignalBinding {
 
     execute (args) {
 
-        let params = args.concat(this.args);
-        let result = this.listener.apply(null, params);
-
-        this.callCount++;
+        let result = this.listener.apply(null, args.concat(this.args));
 
         if (this.isOnce)
         {

@@ -8,7 +8,7 @@ export default class Signal {
         this.prevParams = [];
         this.memorize = false;
         this.active = true;
-        this.shouldPropagate = true;
+        this.propagate = true;
 
     }
 
@@ -42,26 +42,26 @@ export default class Signal {
 
     }
 
-    add (listener, priority = 0, ...args) {
+    add (listener, ...args) {
 
-        return this.register(listener, false, priority, args);
-
-    }
-
-    addOnce (listener, priority = 0, ...args) {
-
-        return this.register(listener, true, priority, args);
+        return this.register(listener, false, args);
 
     }
 
-    register (listener, isOnce, priority, args) {
+    addOnce (listener, ...args) {
+
+        return this.register(listener, true, args);
+
+    }
+
+    register (listener, isOnce, args) {
 
         if (!this.validate(listener, false))
         {
             return null;
         }
 
-        let binding = new SignalBinding(this, listener, false, priority, args);
+        let binding = new SignalBinding(this, listener, false, args);
 
         this.callbacks.set(binding, listener);
 
@@ -90,7 +90,7 @@ export default class Signal {
                 result = binding.execute(args);
             }
 
-            if (!this.shouldPropagate || !result)
+            if (!this.propagate || !result)
             {
                 return;
             }
@@ -119,7 +119,7 @@ export default class Signal {
 
     halt () {
 
-        this.shouldPropagate = false;
+        this.propagate = false;
 
     }
 
