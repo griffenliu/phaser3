@@ -1,4 +1,4 @@
-import Vec2 from 'math/Vec2.js';
+import Vec2 from 'math/vector/Vec2.js';
 
 export default class Line {
 

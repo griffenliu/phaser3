@@ -62,6 +62,8 @@ export function set (v, a) {
     v[0] = a[0];
     v[1] = a[1];
 
+    return v;
+
 }
 
 export function neg (a, dst = new vec2(2)) {
@@ -199,6 +201,24 @@ export function abs (a, dst = new vec2(2)) {
 
 }
 
+export function floor (a, dst = new vec2(2)) {
+
+    dst[0] = Math.floor(a[0]);
+    dst[1] = Math.floor(a[1]);
+
+    return dst;
+
+}
+
+export function ceil (a, dst = new vec2(2)) {
+
+    dst[0] = Math.ceil(a[0]);
+    dst[1] = Math.ceil(a[1]);
+
+    return dst;
+
+}
+
 export function max (a, b, dst = new vec2(2)) {
 
     dst[0] = Math.max(a[0], b[0]);
@@ -225,6 +245,8 @@ export function equal (a, b, dst = new vec2(2)) {
     );
 
 }
+
+
 
 //  Vector Masks
 

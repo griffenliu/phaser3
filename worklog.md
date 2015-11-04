@@ -13,8 +13,13 @@ I'll add to this bullet list as I think of things while writing the entries belo
 
 ### 3rd November 2015
 
-The somewhat tedious but vital task of migrating the vmath functions over has begun. Vec2Math.js is finished and now time to start on Vec3Math. Vec2Math assumes an array like object (Float32Array ideally) being passed to all of its functions. Sadly transpilers cannot let you create a class that extends a native type like Float32Array, so that's out of the question for now.
+The somewhat tedious but vital task of migrating the vmath functions over has begun. Vec2Math.js is finished and now time to start on Vec3Math. Vec2Math assumes an array like object (Float32Array ideally) being passed to all of its functions.
 
+Sadly transpilers cannot let you create a class that extends a native type like Float32Array, so that's out of the question for now. However we can use bracket notation to access numeric properties. Which means Vec2 can have properties [0] and [1] which are effectively its x and y. This means for all the Vec2Math functions you can pass in either a Vec2 object, a Float32Array or an Array and they'll work with all of them, with no internal conditional checks at all.
+
+Also added Math.clamp. Figured it will be useful (especially for things like Vec2 angle calculation).
+
+Vec2 is now done. Need to do tests for it, but it's a good combination of all the key vec2 classes from Phaser 2 and various other libraries. Design wise I've gone for zero method chaining and unrolled code everywhere.
 
 ### 2nd November 2015
 
