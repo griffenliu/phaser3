@@ -26,6 +26,22 @@ export default class BaseColor {
 
     }
 
+    get r1 () {
+        return this.gl[0];
+    }
+
+    get g1 () {
+        return this.gl[1];
+    }
+
+    get b1 () {
+        return this.gl[2];
+    }
+
+    get a1 () {
+        return this.gl[3];
+    }
+
     get red () {
         return this.r;
     }

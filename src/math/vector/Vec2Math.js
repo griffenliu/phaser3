@@ -246,8 +246,6 @@ export function equal (a, b, dst = new vec2(2)) {
 
 }
 
-
-
 //  Vector Masks
 
 export function maskEqual (a, b) {

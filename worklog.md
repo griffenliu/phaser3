@@ -11,6 +11,12 @@ I'll add to this bullet list as I think of things while writing the entries belo
 * I need to find a way to allow for non-English error messages in Errors and console warnings.
 * I'd like to find a way to allow for non-English jsdocs as well, inline in the code, but not sure how without using some kind of build script (which may not be a bad idea?)
 
+### 4th November 2015
+
+Started work on the common renderer functions and classes, such as WebGLGetContext, ContextOptions, etc. Also built the WebGLMini renderer. All it does is clear the WebGL context with a single color, but it serves another purpose in that it validates the common renderer components at the same time.
+
+Will also create a mini renderer that just draws points, and then progress into textures and batches. The whole point is that there is no one fixed renderer, and you can chop and change at will. So providing some really fundamental 'core' templates will be really useful for both unit testing and allowing devs to create their own renderers (or expand on those provided)
+
 ### 3rd November 2015
 
 The somewhat tedious but vital task of migrating the vmath functions over has begun. Vec2Math.js is finished and now time to start on Vec3Math. Vec2Math assumes an array like object (Float32Array ideally) being passed to all of its functions.
