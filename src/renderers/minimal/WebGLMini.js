@@ -6,9 +6,6 @@ export default class WebGLMini {
 
     constructor (canvas) {
 
-        this.width = 0;
-        this.height = 0;
-
         this.contextOptions = new WebGLContextOptions();
         this.contextHandler = new WebGLContextHandler();
 
@@ -22,9 +19,6 @@ export default class WebGLMini {
     }
 
     init (canvas) {
-
-        this.width = canvas.width;
-        this.height = canvas.height;
 
         this.contextHandler.add(canvas);
 

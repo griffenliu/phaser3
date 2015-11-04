@@ -32,8 +32,6 @@
 </head>
 <body>
 
-    <h1 style="float: right; text-align: right">Phaser III<br />Test Runner</h1>
-
     <div id="game"></div>
 
     <?php
