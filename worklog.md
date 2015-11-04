@@ -11,6 +11,11 @@ I'll add to this bullet list as I think of things while writing the entries belo
 * I need to find a way to allow for non-English error messages in Errors and console warnings.
 * I'd like to find a way to allow for non-English jsdocs as well, inline in the code, but not sure how without using some kind of build script (which may not be a bad idea?)
 
+### 3rd November 2015
+
+The somewhat tedious but vital task of migrating the vmath functions over has begun. Vec2Math.js is finished and now time to start on Vec3Math. Vec2Math assumes an array like object (Float32Array ideally) being passed to all of its functions. Sadly transpilers cannot let you create a class that extends a native type like Float32Array, so that's out of the question for now.
+
+
 ### 2nd November 2015
 
 Time to convert Signals to ES6. I really like Signals as I feel they solve a lot of the issues that normal string based event dispatchers have. However they fail in one key area: You cannot bind a generic listener to a class and be notified about all of the signals it dispatches. You have to bind a listener to a specific signal, a 1:1 mapping. This is something I'm going to address in the rewrite.
