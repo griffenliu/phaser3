@@ -17,6 +17,8 @@ Started work on the common renderer functions and classes, such as WebGLGetConte
 
 Will also create a mini renderer that just draws points, and then progress into textures and batches. The whole point is that there is no one fixed renderer, and you can chop and change at will. So providing some really fundamental 'core' templates will be really useful for both unit testing and allowing devs to create their own renderers (or expand on those provided)
 
+Update: Finished the first pass at the Point renderer. It's working and allowed me to create and test a Program class and the CompileShader function. The next task is to create a Point renderer that uses a Buffer internally to manage multiple points. I will then create a WebGLShader class that allows for uniform attributes. Once the Buffer point renderer and shader classes are done it's an easy step to batched texture rendering.
+
 ### 3rd November 2015
 
 The somewhat tedious but vital task of migrating the vmath functions over has begun. Vec2Math.js is finished and now time to start on Vec3Math. Vec2Math assumes an array like object (Float32Array ideally) being passed to all of its functions.

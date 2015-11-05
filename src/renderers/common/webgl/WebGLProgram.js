@@ -14,6 +14,21 @@ export default class WebGLProgram {
 
     }
 
+    getAttrib (name) {
+
+        let loc = this.gl.getAttribLocation(this.program, name);
+
+        if (loc < 0)
+        {
+            console.warn('WebGLProgram - failed to get attribute location: ' + name);
+        }
+        else
+        {
+            return loc;
+        }
+
+    }
+
     attach (...shaders) {
 
         for (let shader of shaders)

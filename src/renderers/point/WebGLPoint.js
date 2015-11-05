@@ -41,9 +41,11 @@ export default class WebGLPointRenderer {
         //  Our super basic shaders
 
         let vertexSrc = [
+            'attribute vec4 pointPosition;',
+            'attribute float pointSize;',
             'void main() {',
-            '   gl_Position = vec4(0.0, 0.0, 0.0, 1.0);',
-            '   gl_PointSize = 32.0;',
+            '   gl_Position = pointPosition;',
+            '   gl_PointSize = pointSize;',
             '}'
         ];
 
@@ -59,6 +61,27 @@ export default class WebGLPointRenderer {
         this.program = new WebGLProgram(this.gl);
 
         this.program.attach(vertexShader, fragmentShader).link().use();
+
+        this.pos = this.program.getAttrib('pointPosition');
+        this.size = this.program.getAttrib('pointSize');
+
+        this.gl.vertexAttrib3f(this.pos, 0.0, 0.0, 0.0);
+        this.gl.vertexAttrib1f(this.size, 32.0);
+
+    }
+
+    update (x, y) {
+
+        //  Map to WebGL coordinate space
+        const cx = this.width / 2;
+        const cy = this.height / 2;
+
+        const tx = (x - cx) / cx;
+        const ty = (cy - y) / cy;
+
+        this.gl.vertexAttrib3f(this.pos, tx, ty, 0.0);
+
+        this.render();
 
     }
 

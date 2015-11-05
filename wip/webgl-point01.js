@@ -9,4 +9,5 @@ AddToDOM(canvas, 'game');
 
 let renderer = new WebGLPointRenderer(canvas);
 
-renderer.render();
+//  Render a 32px size GL POINT at 200x300
+renderer.update(200, 300);
