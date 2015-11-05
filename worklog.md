@@ -11,6 +11,17 @@ I'll add to this bullet list as I think of things while writing the entries belo
 * I need to find a way to allow for non-English error messages in Errors and console warnings.
 * I'd like to find a way to allow for non-English jsdocs as well, inline in the code, but not sure how without using some kind of build script (which may not be a bad idea?)
 
+### 5th November 2015
+
+Today should really be all about particle fireworks, right? Alas that's not likely, but it's a good incentive to get the batch renderer done.
+
+BaseColor has a new `dirty` flag to stop its (relatively expensive) `update` method from running when it's not needed.
+
+I've also moved all of the common renderer functions out of the 'renderers' folder, because they're more generic than that.
+
+The MinimalRenderer is now a good example of the new set-up and includes AUTO switching support as well.
+
+
 ### 4th November 2015
 
 Started work on the common renderer functions and classes, such as WebGLGetContext, ContextOptions, etc. Also built the WebGLMini renderer. All it does is clear the WebGL context with a single color, but it serves another purpose in that it validates the common renderer components at the same time.

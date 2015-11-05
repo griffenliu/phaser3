@@ -22,6 +22,8 @@ export default class BaseColor {
         this.color32 = 0;
         this.rgba = '';
 
+        this.dirty = true;
+
         this.update();
 
     }
@@ -60,15 +62,27 @@ export default class BaseColor {
 
     set red (value) {
 
+        if (value === this.r)
+        {
+            return;
+        }
+
         value = Math.floor(Math.abs(value));
 
         this.r = Math.min(value, 255);
 
         this.gl[0] = this.r / 255;
 
+        this.dirty = true;
+
     }
 
     set green (value) {
+
+        if (value === this.g)
+        {
+            return;
+        }
 
         value = Math.floor(Math.abs(value));
 
@@ -76,9 +90,16 @@ export default class BaseColor {
 
         this.gl[1] = this.g / 255;
 
+        this.dirty = true;
+
     }
 
     set blue (value) {
+
+        if (value === this.b)
+        {
+            return;
+        }
 
         value = Math.floor(Math.abs(value));
 
@@ -86,9 +107,16 @@ export default class BaseColor {
 
         this.gl[2] = this.b / 255;
 
+        this.dirty = true;
+
     }
 
     set alpha (value) {
+
+        if (value === this.a)
+        {
+            return;
+        }
 
         value = Math.floor(Math.abs(value));
 
@@ -96,15 +124,20 @@ export default class BaseColor {
 
         this.gl[3] = this.a / 255;
 
+        this.dirty = true;
+
     }
 
     //  Assumes all values are valid and within range (0 - 255)
+    //  and are always dirty
     setRGB (r, g, b, a = 255) {
 
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
+
+        this.dirty = true;
 
         return this.update();
 
@@ -233,6 +266,11 @@ export default class BaseColor {
 
     update () {
 
+        if (!this.dirty)
+        {
+            return this;
+        }
+
         this.color = GetColor(this.r, this.g, this.b);
         this.color32 = GetColor32(this.r, this.g, this.b, this.a);
         this.rgba = `rgba(${this.r}, ${this.g}, ${this.b}, ${255 / this.a})`;
@@ -241,6 +279,8 @@ export default class BaseColor {
         this.gl[1] = this.g / 255;
         this.gl[2] = this.b / 255;
         this.gl[3] = this.a / 255;
+
+        this.dirty = false;
 
         return this;
 

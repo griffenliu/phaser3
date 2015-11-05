@@ -1,8 +1,8 @@
-import WebGLContextHandler from 'renderers/common/webgl/WebGLContextHandler.js';
-import WebGLContextOptions from 'renderers/common/webgl/WebGLContextOptions.js';
-import WebGLGetContext from 'renderers/common/webgl/WebGLGetContext.js';
+import WebGLContextOptions from 'webgl/ContextOptions.js';
+import WebGLContextHandler from 'webgl/ContextHandler.js';
+import WebGLGetContext from 'webgl/GetContext.js';
 
-export default class WebGLMini {
+export default class WebGLRenderer {
 
     constructor (canvas) {
 
@@ -31,9 +31,9 @@ export default class WebGLMini {
 
     }
 
-    render (r, g, b, a) {
+    render (color) {
 
-        this.gl.clearColor(r, g, b, a);
+        this.gl.clearColor(color.r1, color.g1, color.b1, color.a1);
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
