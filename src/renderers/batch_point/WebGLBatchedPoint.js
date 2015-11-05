@@ -1,8 +1,8 @@
-import WebGLContextHandler from 'renderers/common/webgl/WebGLContextHandler.js';
-import WebGLContextOptions from 'renderers/common/webgl/WebGLContextOptions.js';
-import WebGLGetContext from 'renderers/common/webgl/WebGLGetContext.js';
-import CompileShader from 'renderers/common/webgl/CompileShader.js';
-import WebGLProgram from 'renderers/common/webgl/WebGLProgram.js';
+import WebGLContextHandler from 'webgl/ContextHandler.js';
+import WebGLContextOptions from 'webgl/ContextOptions.js';
+import WebGLGetContext from 'webgl/GetContext.js';
+import CompileShader from 'webgl/CompileShader.js';
+import WebGLProgram from 'webgl/Program.js';
 
 export default class WebGLBatchedPointRenderer {
 
