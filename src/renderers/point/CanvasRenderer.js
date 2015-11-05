@@ -1,11 +1,15 @@
 import CanvasGetContext from 'canvas/GetContext.js';
 
-export default class CanvasMinimalRenderer {
+export default class CanvasPointRenderer {
 
     constructor (canvas) {
 
         this.canvas = null;
         this.context = null;
+
+        this.x = 0;
+        this.y = 0;
+        this.size = 32;
 
         if (canvas)
         {
@@ -22,12 +26,22 @@ export default class CanvasMinimalRenderer {
 
     }
 
-    render (color) {
+    update (x, y) {
+
+        this.x = x;
+        this.y = y;
+
+    }
+
+    render () {
 
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.context.fillStyle = color.rgba;
+        this.context.fillStyle = '#000000';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.context.fillStyle = '#ffff00';
+        this.context.fillRect(this.x - (this.size / 2), this.y - (this.size / 2), this.size, this.size);
 
     }
 

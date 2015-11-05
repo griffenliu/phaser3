@@ -21,6 +21,7 @@ I've also moved all of the common renderer functions out of the 'renderers' fold
 
 The MinimalRenderer is now a good example of the new set-up and includes AUTO switching support as well.
 
+The PointRenderer is now finished and includes AUTO switching too.
 
 ### 4th November 2015
 

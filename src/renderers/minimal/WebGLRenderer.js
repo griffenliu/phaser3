@@ -2,7 +2,7 @@ import WebGLContextOptions from 'webgl/ContextOptions.js';
 import WebGLContextHandler from 'webgl/ContextHandler.js';
 import WebGLGetContext from 'webgl/GetContext.js';
 
-export default class WebGLRenderer {
+export default class WebGLMinimalRenderer {
 
     constructor (canvas) {
 
