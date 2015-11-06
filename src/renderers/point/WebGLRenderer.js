@@ -11,7 +11,7 @@ export default class WebGLPointRenderer {
         this.width = 0;
         this.height = 0;
 
-        this.contextOptions = new WebGLContextOptions();
+        this.contextOptions = WebGLContextOptions();
         this.contextHandler = new WebGLContextHandler();
 
         this.gl = null;

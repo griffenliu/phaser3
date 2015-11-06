@@ -6,7 +6,7 @@ export default class WebGLMinimalRenderer {
 
     constructor (canvas) {
 
-        this.contextOptions = new WebGLContextOptions();
+        this.contextOptions = WebGLContextOptions();
         this.contextHandler = new WebGLContextHandler();
 
         this.gl = null;
