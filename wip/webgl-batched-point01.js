@@ -10,6 +10,8 @@ let renderer = new WebGLBatchedPointRenderer(canvas);
 
 renderer.addTri(100, 100, 128);
 renderer.addTri(300, 100, 128);
+renderer.addTri(500, 100, 128);
+renderer.addTri(700, 100, 128);
 
 //  Bind and draw
 renderer.bindStatic();

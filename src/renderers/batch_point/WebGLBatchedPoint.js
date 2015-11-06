@@ -41,21 +41,32 @@ export default class WebGLBatchedPointRenderer {
             throw new Error('Browser does not support WebGL');
         }
 
+        this.gl.enable(this.gl.BLEND);
+
         //  Our super basic shaders
 
         let vertexSrc = [
             'attribute vec4 pointPosition;',
+            'varying vec4 vColor;',
+
             'void main() {',
             '   gl_Position = pointPosition;',
             '   gl_PointSize = 8.0;',
+            '   float uv = pointPosition.x / 800.0;',
+            '   vColor = vec4(uv, 0.5, 0.0, 1.0);',
             '}'
         ];
 
         let fragmentSrc = [
+            'precision mediump float;',
+            'varying vec4 vColor;',
+
             'void main() {',
-            '   gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);',
+            '   gl_FragColor = vColor;',
             '}'
         ];
+
+        // vec4(1.0, 0.0, 1.0, 1.0);
 
         let vertexShader = CompileShader(this.gl, vertexSrc, this.gl.VERTEX_SHADER);
         let fragmentShader = CompileShader(this.gl, fragmentSrc, this.gl.FRAGMENT_SHADER);
