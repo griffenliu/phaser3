@@ -1,3 +1,5 @@
+import * as Attribute from 'webgl/Attribute.js';
+
 export default class WebGLProgram {
 
     constructor (gl) {
@@ -16,16 +18,7 @@ export default class WebGLProgram {
 
     getAttrib (name) {
 
-        let loc = this.gl.getAttribLocation(this.program, name);
-
-        if (loc < 0)
-        {
-            console.warn('WebGLProgram - failed to get attribute location: ' + name);
-        }
-        else
-        {
-            return loc;
-        }
+        return Attribute.get(this.gl, this.program, name);
 
     }
 
