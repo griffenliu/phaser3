@@ -176,7 +176,16 @@ export default class Vec2 {
 
     }
 
-    length () {
+    set length (v) {
+
+        const angle = Math.atan2(this[1], this[0]);
+
+        this[0] = Math.cos(angle) * v;
+        this[1] = Math.sin(angle) * v;
+
+    }
+
+    get length () {
 
         return Math.sqrt(this[0] * this[0] + this[1] * this[1]);
 
