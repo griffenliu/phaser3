@@ -13,8 +13,8 @@ renderer.addTri(300, 100, 128);
 renderer.addTri(500, 100, 128);
 renderer.addTri(700, 100, 128);
 
-//  Bind and draw
-renderer.bindStatic();
+//  Buffer and draw
+renderer.bufferStatic();
 
 // renderer.render();
 // renderer.renderLines();

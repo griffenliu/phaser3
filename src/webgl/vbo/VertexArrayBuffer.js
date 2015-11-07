@@ -30,12 +30,18 @@ export default class VertexArrayBuffer {
             return -1;
         }
 
+        this.bindBuffer(gl);
+
+    }
+
+    bindBuffer (gl) {
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     }
 
     //  usage = gl.DYNAMIC_DRAW, gl.STATIC_DRAW or gl.STREAM_DRAW
-    bind (gl, usage) {
+    bufferData (gl, usage) {
 
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices, usage);
 
@@ -44,12 +50,22 @@ export default class VertexArrayBuffer {
     //  Add a single vert set into the array
     add (x, y) {
 
-        console.log('add', this.index, this.total);
+        // console.log('add', this.index, this.total);
 
         this.vertices[this.index++] = x;
         this.vertices[this.index++] = y;
 
         this.total++;
+
+        //  return the starting index of the point
+        return this.index - 2;
+
+    }
+
+    update (index, x, y) {
+
+        this.vertices[index] = x;
+        this.vertices[index + 1] = y;
 
     }
 

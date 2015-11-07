@@ -11,11 +11,18 @@ I'll add to this bullet list as I think of things while writing the entries belo
 * I need to find a way to allow for non-English error messages in Errors and console warnings.
 * I'd like to find a way to allow for non-English jsdocs as well, inline in the code, but not sure how without using some kind of build script (which may not be a bad idea?)
 
+### 7th November 2015
+
+Fixed the MasterClock getTime function.
+
+Updated VertexArrayBuffer so that the naming conventions for bind and buffer are now correct.
+
+Updated WebGLBatchedPoint as a result and added a basic x position based fragment color. Added in the ability to update buffer index values so we can test basic animation.
+
+
 ### 6th November 2015
 
 Added the new WebGL classes Attribute (for working with vertex attributes) and VertexArrayBuffer (for, well have a guess). Updated the batched Point renderer to use them.
-
-
 
 ### 5th November 2015
 

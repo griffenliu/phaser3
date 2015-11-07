@@ -41,8 +41,6 @@ export default class WebGLBatchedPointRenderer {
             throw new Error('Browser does not support WebGL');
         }
 
-        this.gl.enable(this.gl.BLEND);
-
         //  Our super basic shaders
 
         let vertexSrc = [
@@ -51,9 +49,9 @@ export default class WebGLBatchedPointRenderer {
 
             'void main() {',
             '   gl_Position = pointPosition;',
-            '   gl_PointSize = 8.0;',
-            '   float uv = pointPosition.x / 800.0;',
-            '   vColor = vec4(uv, 0.5, 0.0, 1.0);',
+            '   gl_PointSize = 16.0;',
+            '   float uv = 0.5 + pointPosition.x;',
+            '   vColor = vec4(uv, 0.5, uv*2.0, 1.0);',
             '}'
         ];
 
@@ -84,16 +82,32 @@ export default class WebGLBatchedPointRenderer {
 
     }
 
+    getLocalX (x) {
+
+        const cx = this.width / 2;
+
+        return (x - cx) / cx;
+
+    }
+
+    getLocalY (y) {
+
+        const cy = this.height / 2;
+
+        return (cy - y) / cy;
+
+    }
+
     addPoint (x, y) {
 
         //  Map to WebGL coordinate space
-        const cx = this.width / 2;
-        const cy = this.height / 2;
+        return this.vertexBuffer.add(this.getLocalX(x), this.getLocalY(y));
 
-        const tx = (x - cx) / cx;
-        const ty = (cy - y) / cy;
+    }
 
-        this.vertexBuffer.add(tx, ty);
+    updatePoint (index, x, y) {
+
+        return this.vertexBuffer.update(index, this.getLocalX(x), this.getLocalY(y));
 
     }
 
@@ -107,17 +121,17 @@ export default class WebGLBatchedPointRenderer {
 
     }
 
-    bindStatic () {
+    bufferStatic () {
 
         //  As soon as you bind it, the data is written and needs re-binding if updated
-        this.vertexBuffer.bind(this.gl, this.gl.STATIC_DRAW);
+        this.vertexBuffer.bufferData(this.gl, this.gl.STATIC_DRAW);
 
     }
 
-    bindDynamic () {
+    bufferDynamic () {
 
         //  As soon as you bind it, the data is written and needs re-binding if updated
-        this.vertexBuffer.bind(this.gl, this.gl.DYNAMIC_DRAW);
+        this.vertexBuffer.bufferData(this.gl, this.gl.DYNAMIC_DRAW);
 
     }
 
