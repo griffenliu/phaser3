@@ -19,6 +19,9 @@ Updated VertexArrayBuffer so that the naming conventions for bind and buffer are
 
 Updated WebGLBatchedPoint as a result and added a basic x position based fragment color. Added in the ability to update buffer index values so we can test basic animation.
 
+Added a length setter to the Vec2 class.
+
+Created a batched point 02 demo which just moves a single point around based on a position and velocity vector. Simple, but proves the batch update is working. The next demo will be to test multiple points.
 
 ### 6th November 2015
 
