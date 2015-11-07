@@ -38,6 +38,10 @@ export default class ClockTest {
         this.ctx.fillText('Clock2: ' + this.clock2.time, 16, 90);
         this.ctx.fillText('Clock3: ' + this.clock3.time, 16, 120);
 
+        this.ctx.fillText('Tick: ' + this.clock1.tickSize, 300, 60);
+        this.ctx.fillText('Tick: ' + this.clock2.tickSize, 300, 90);
+        this.ctx.fillText('Tick: ' + this.clock3.tickSize, 300, 120);
+
     }
 
 }
