@@ -11,17 +11,18 @@ export default class MasterClock {
 
     constructor () {
 
+        //  This needs normalising with perf now in the step loop
         this.getTime = Date.now;
 
         if (window.performance)
         {
             if (window.performance.now)
             {
-                this.getTime = () => { return window.performance.now };
+                this.getTime = () => { return window.performance.now() };
             }
             else if (window.performance.webkitNow)
             {
-                this.getTime = () => { return window.performance.webkitNow };
+                this.getTime = () => { return window.performance.webkitNow() };
             }
         }
 
