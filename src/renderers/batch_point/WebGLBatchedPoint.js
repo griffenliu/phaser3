@@ -49,7 +49,7 @@ export default class WebGLBatchedPointRenderer {
 
             'void main() {',
             '   gl_Position = pointPosition;',
-            '   gl_PointSize = 16.0;',
+            '   gl_PointSize = 4.0;',
             '   float uv = 0.5 + pointPosition.x;',
             '   vColor = vec4(uv, 0.5, uv*2.0, 1.0);',
             '}'
@@ -75,8 +75,8 @@ export default class WebGLBatchedPointRenderer {
 
         //  Populate the vertex buffer
 
-        //  2 verts per element, 10 elements in total
-        this.vertexBuffer.create(this.gl, 2, 100);
+        //  2 verts per element, 100 elements in total
+        this.vertexBuffer.create(this.gl, 2, 1000);
 
         this.pos = Attribute.createFloat(this.gl, this.program.program, 'pointPosition');
 

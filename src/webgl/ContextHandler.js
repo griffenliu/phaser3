@@ -28,6 +28,8 @@ export default class WebGLContextHandler {
 
     lost (event) {
 
+        console.log('WebGL Context Lost');
+
         event.preventDefault();
 
         this.contextLost = true;
@@ -35,6 +37,8 @@ export default class WebGLContextHandler {
     }
 
     restored () {
+
+        console.log('WebGL Context restored');
 
         this.contextLost = false;
 
