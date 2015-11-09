@@ -308,7 +308,7 @@ export function maskGreaterEq (a, b) {
 
 export function maskNot (a) {
 
-    return [ !a[0], !a[1], ![a2] ];
+    return [ !a[0], !a[1], !a[2] ];
 
 }
 

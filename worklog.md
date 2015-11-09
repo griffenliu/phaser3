@@ -17,6 +17,8 @@ Time for some important but menial work: the rest of the vector math classes.
 
 Have split up Vec2 so the more generic functions are pulled to their own files. Reorganised the folder structure as well, so we can bundle common Vector math in one place (like Rotate and RotateAround) and move the VecX specific functions to their own files too, trimming the core class sizes down as a result. Also added in a few additional functions that Three.JS requires.
 
+VecMath3 and VecMath4 are completed. Vec3 is done, but Vec4 still remains.
+
 ### 8th November 2015
 
 Created batch point demos 3 and 4. They use 1000 particles (and 4 uses a gravity well) and it's working quite nicely. It's still using a fixed vertex buffer array position though, which really needs to be built dynamically, but at least the systems are all holding up together.
