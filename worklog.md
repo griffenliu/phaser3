@@ -13,7 +13,9 @@ I'll add to this bullet list as I think of things while writing the entries belo
 
 ### 9th November 2015
 
-Time for some more important but menial work - the rest of the vector math classes.
+Time for some important but menial work: the rest of the vector math classes.
+
+Have split up Vec2 so the more generic functions are pulled to their own files. Reorganised the folder structure as well, so we can bundle common Vector math in one place (like Rotate and RotateAround) and move the VecX specific functions to their own files too, trimming the core class sizes down as a result. Also added in a few additional functions that Three.JS requires.
 
 ### 8th November 2015
 
