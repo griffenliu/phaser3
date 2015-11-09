@@ -11,6 +11,10 @@ I'll add to this bullet list as I think of things while writing the entries belo
 * I need to find a way to allow for non-English error messages in Errors and console warnings.
 * I'd like to find a way to allow for non-English jsdocs as well, inline in the code, but not sure how without using some kind of build script (which may not be a bad idea?)
 
+### 9th November 2015
+
+Time for some more important but menial work - the rest of the vector math classes.
+
 ### 8th November 2015
 
 Created batch point demos 3 and 4. They use 1000 particles (and 4 uses a gravity well) and it's working quite nicely. It's still using a fixed vertex buffer array position though, which really needs to be built dynamically, but at least the systems are all holding up together.

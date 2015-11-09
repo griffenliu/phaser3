@@ -12,7 +12,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    'src/test2.js': 'wip/test2.js'
+                    'wip/dist/test1.js': 'wip/webgl-batched-point05.js'
                 }
             }
         }
