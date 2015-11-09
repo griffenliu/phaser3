@@ -1,6 +1,4 @@
-import Clamp from 'math/Clamp.js';
-
-//  Everything is unrolled with no method chaining.
+//  Everything is unrolled with no method chaining (even if it means duplicate code)
 
 export default class Vec3 {
 
@@ -169,13 +167,13 @@ export default class Vec3 {
 
     }
 
-    //  TODO
     set length (v) {
 
-        const angle = Math.atan2(this[1], this[0]);
+        const s = v / Math.sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2]);
 
-        this[0] = Math.cos(angle) * v;
-        this[1] = Math.sin(angle) * v;
+        this[0] *= s;
+        this[1] *= s;
+        this[2] *= s;
 
     }
 
@@ -188,58 +186,6 @@ export default class Vec3 {
     lengthManhattan () {
 
         return Math.abs(this[0]) + Math.abs(this[1]) + Math.abs(this[2]);
-
-    }
-
-    distance (v) {
-
-        let dx = this[0] - v[0];
-        let dy = this[1] - v[1];
-        let dz = this[2] - v[2];
-
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-    }
-
-    distanceSq (v) {
-
-        let dx = this[0] - v[0];
-        let dy = this[1] - v[1];
-        let dz = this[2] - v[2];
-
-        return dx * dx + dy * dy + dz * dz;
-
-    }
-
-    angle (v) {
-
-        const dot = this[0] * v[0] + this[1] * v[1] + this[2] * (v[2] || 1);
-        const len = Math.sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2]);
-        const lenV = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-
-        return Math.acos(Clamp(dot / (len * lenV), -1, 1));
-
-    }
-
-    project (v) {
-
-        const dot = (this[0] * v[0]) + (this[1] * v[1]);
-        const lenV = (v[0] * v[0]) + (v[1] * v[1]);
-        const s = dot / lenV;
-
-        this[0] *= s;
-        this[1] *= s;
-
-        return this;
-
-    }
-
-    lerp (v, a) {
-
-        this[0] += (v[0] - this[0]) * a;
-        this[1] += (v[1] - this[1]) * a;
-
-        return this;
 
     }
 
