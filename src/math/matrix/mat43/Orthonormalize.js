@@ -1,17 +1,25 @@
+import Vec3Math from 'math/vector/vec3/Vec3Math.js';
+import Right from 'math/matrix/mat43/Right.js';
+import Up from 'math/matrix/mat43/Up.js';
+import At from 'math/matrix/mat43/At.js';
+import Pos from 'math/matrix/mat43/Pos.js';
+
 let mat = Float32Array;
+
+//  TODO - Needs finishing (once Vec3 is split up)
 
 export default function (m, dst = new mat(12)) {
 
-    var normalize = VMath.v3Normalize;
-    var length    = VMath.v3Length;
-    var dot       = VMath.v3Dot;
-    var cross     = VMath.v3Cross;
-    var abs       = Math.abs;
+    // var normalize = VMath.v3Normalize;
+    // var length    = VMath.v3Length;
+    // var dot       = VMath.v3Dot;
+    // var cross     = VMath.v3Cross;
+    // var abs       = Math.abs;
 
-    var right = VMath.m43Right(m);
-    var up    = VMath.m43Up(m);
-    var at    = VMath.m43At(m);
-    var pos   = VMath.m43Pos(m);
+    // var right = VMath.m43Right(m);
+    // var up    = VMath.m43Up(m);
+    // var at    = VMath.m43At(m);
+    // var pos   = VMath.m43Pos(m);
 
     var innerX = length(right);
     var innerY = length(up);
