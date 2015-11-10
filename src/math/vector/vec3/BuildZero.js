@@ -9,4 +9,3 @@ export default function (dst = new vec3(3)) {
     return dst;
 
 }
-

@@ -1,4 +1,3 @@
-let vec3 = Float32Array;
 
 export default function (a, b) {
 

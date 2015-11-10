@@ -9,6 +9,3 @@ export default function (m, a, b, dst = new vec3(3)) {
     return dst;
 
 }
-
-//  Scalar Operations
-
