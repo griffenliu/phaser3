@@ -9,4 +9,3 @@ export default function (a, dst = new vec4(4)) {
 
     return dst;
 }
-

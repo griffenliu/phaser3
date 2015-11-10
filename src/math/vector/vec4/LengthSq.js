@@ -1,4 +1,3 @@
-let vec4 = Float32Array;
 
 export default function (a) {
 
@@ -7,7 +6,6 @@ export default function (a) {
     const a2 = a[2];
     const a3 = a[3];
 
-    return ((a0 * a0) + (a1 * a1) + (a2 * a2) + (a3 * a3));
+    return (a0 * a0) + (a1 * a1) + (a2 * a2) + (a3 * a3);
 
 }
-

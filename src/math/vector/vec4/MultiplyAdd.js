@@ -12,6 +12,7 @@ export default function (a, dst = new vec4(4)) {
     if (lsq > 0.0)
     {
         const lr = 1.0 / Math.sqrt(lsq);
+
         dst[0] = a0 * lr;
         dst[1] = a1 * lr;
         dst[2] = a2 * lr;
@@ -28,4 +29,3 @@ export default function (a, dst = new vec4(4)) {
     return dst;
 
 }
-

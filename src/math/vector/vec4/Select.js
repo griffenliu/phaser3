@@ -10,6 +10,3 @@ export default function (m, a, b, dst = new vec4(4)) {
     return dst;
 
 }
-
-//  Scalar Operations
-

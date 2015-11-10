@@ -1,4 +1,3 @@
-let vec4 = Float32Array;
 
 export default function (a) {
 
@@ -10,4 +9,3 @@ export default function (a) {
     return Math.sqrt((a0 * a0) + (a1 * a1) + (a2 * a2) + (a3 * a3));
 
 }
-
