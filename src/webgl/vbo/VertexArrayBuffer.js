@@ -47,6 +47,24 @@ export default class VertexArrayBuffer {
 
     }
 
+    bufferDynamicData (gl) {
+
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
+
+    }
+
+    bufferStaticData (gl) {
+
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
+
+    }
+
+    bufferStreamData (gl) {
+
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STREAM_DRAW);
+
+    }
+
     //  Add a single vert set into the array
     add (x, y) {
 
