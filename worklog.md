@@ -19,6 +19,8 @@ Have split up Vec2 so the more generic functions are pulled to their own files. 
 
 VecMath3 and VecMath4 are completed. Vec3 is done, but Vec4 still remains.
 
+Quaternions are now finished, along with splitting up all of the Vector and Matrix functions. The final part left to do are some primitives (so you can instantiate a Vec4 for example) but this isn't actually needed for the 3D libs, so I will leave it be for now. This entire math section is ripe for some unit tests.
+
 ### 8th November 2015
 
 Created batch point demos 3 and 4. They use 1000 particles (and 4 uses a gravity well) and it's working quite nicely. It's still using a fixed vertex buffer array position though, which really needs to be built dynamically, but at least the systems are all holding up together.
