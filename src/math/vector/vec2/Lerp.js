@@ -1,11 +1,13 @@
 //  A linear interpolation between a and b (by amount 't')
 //  Set into a which is returned
 
-export default function (a, b, t) {
+let vec2 = Float32Array;
 
-    a[0] += (b[0] - a[0]) * t;
-    a[1] += (b[1] - a[1]) * t;
+export default function (a, b, t, dst = new vec2(2)) {
 
-    return a;
+    dst[0] = a[0] + ((b[0] - a[0]) * t);
+    dst[1] = a[1] + ((b[1] - a[1]) * t);
+
+    return dst;
 
 }
