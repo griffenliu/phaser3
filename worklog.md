@@ -2,7 +2,7 @@
 
 Richard Davey (rich@photonstorm.com)
 
-I've decided to keep a log of work on Phaser 3 here in the repo. It can be removed when the project goes live, but will serve as a handy log of what I'm doing and thinking during development.
+I've decided to keep a record of my work on Phaser 3 here in the repo. It can be removed when the project goes live, but will serve as a handy log of what I'm doing and thinking during development.
 
 ### TODO
 
