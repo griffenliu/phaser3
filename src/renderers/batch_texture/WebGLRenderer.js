@@ -1,9 +1,10 @@
-import WebGLContextHandler from 'webgl/ContextHandler.js';
-import WebGLContextOptions from 'webgl/ContextOptions.js';
-import WebGLGetContext from 'webgl/GetContext.js';
+import ContextHandler from 'webgl/ContextHandler.js';
+import ContextOptions from 'webgl/ContextOptions.js';
+import GetContext from 'webgl/GetContext.js';
 import CompileShader from 'webgl/CompileShader.js';
-import WebGLProgram from 'webgl/Program.js';
+import Program from 'webgl/Program.js';
 import VertexArrayBuffer from 'webgl/vbo/VertexArrayBuffer.js';
+import VertexIndexBuffer from 'webgl/vbo/VertexIndexBuffer.js';
 import * as Attribute from 'webgl/Attribute.js';
 
 export default class WebGLBatchedPointRenderer {
@@ -14,10 +15,11 @@ export default class WebGLBatchedPointRenderer {
         this.height = 0;
         this.projection = { x: 0, y: 0 };
 
-        this.contextOptions = WebGLContextOptions();
-        this.contextHandler = new WebGLContextHandler();
+        this.contextOptions = ContextOptions();
+        this.contextHandler = new ContextHandler();
 
         this.vertexBuffer = new VertexArrayBuffer();
+        this.indexBuffer = new VertexIndexBuffer();
 
         this.gl = null;
         this.program = null;
@@ -36,7 +38,7 @@ export default class WebGLBatchedPointRenderer {
 
         this.contextHandler.add(canvas);
 
-        const gl = WebGLGetContext(canvas);
+        const gl = GetContext(canvas);
 
         if (!gl)
         {
@@ -89,7 +91,7 @@ export default class WebGLBatchedPointRenderer {
         const vertexShader = CompileShader(gl, vertexSrc, gl.VERTEX_SHADER);
         const fragmentShader = CompileShader(gl, fragmentSrc, gl.FRAGMENT_SHADER);
 
-        this.program = new WebGLProgram(gl);
+        this.program = new Program(gl);
 
         this.program.attach(vertexShader, fragmentShader).link().use();
 
@@ -115,6 +117,23 @@ export default class WebGLBatchedPointRenderer {
         this.vertexBuffer.bindBuffer();
         this.vertexBuffer.bufferDynamicData();
 
+        //  Populate the index buffer
+        this.indexBuffer.create(gl, 6, 2000);
+        this.indexBuffer.bindBuffer();
+        this.indexBuffer.bufferData();
+
+    }
+
+    render () {
+
+    }
+
+    addVerts () {
+
+    }
+
+    flush () {
+        
     }
 
 }

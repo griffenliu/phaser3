@@ -10,6 +10,7 @@ export default class VertexArrayBuffer {
 
         this.index = 0;
         this.total = 0;
+        this.size = 0;
 
     }
 
@@ -22,6 +23,7 @@ export default class VertexArrayBuffer {
 
         this.index = 0;
         this.total = 0;
+        this.size = 0;
 
         this.buffer = gl.createBuffer();
 
@@ -65,25 +67,10 @@ export default class VertexArrayBuffer {
 
     }
 
-    //  Add a single vert set into the array
-    add (x, y) {
+    reset () {
 
-        // console.log('add', this.index, this.total);
-
-        this.vertices[this.index++] = x;
-        this.vertices[this.index++] = y;
-
-        this.total++;
-
-        //  return the starting index of the point
-        return this.index - 2;
-
-    }
-
-    update (index, x, y) {
-
-        this.vertices[index] = x;
-        this.vertices[index + 1] = y;
+        this.index = 0;
+        this.size = 0;
 
     }
 
