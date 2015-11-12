@@ -142,7 +142,7 @@ export default class WebGLBatchedPointRenderer {
 
     }
 
-    preRender () {
+    render (renderList) {
 
         if (this.contextHandler.contextLost)
         {
@@ -166,15 +166,14 @@ export default class WebGLBatchedPointRenderer {
 
         this.vertexBuffer.reset();
 
-        //  Walk the scene graph
+        //  Walk the render list
+        for (let texture of renderList)
+        {
+
+        }
 
     }
 
-
-
-    addVerts () {
-
-    }
 
     flush () {
         
