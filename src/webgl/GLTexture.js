@@ -1,4 +1,4 @@
-export default class WebGLTexture {
+export default class GLTexture {
 
     constructor (gl) {
 
@@ -153,6 +153,14 @@ export default class WebGLTexture {
     wrapClamp () {
 
         return this.wrap(this.gl.CLAMP_TO_EDGE);
+
+    }
+
+    destroy () {
+
+        this.delete();
+
+        this.gl = null;
 
     }
 

@@ -11,8 +11,8 @@ export default class WebGLBatchedPointRenderer {
 
     constructor (canvas) {
 
-        this.width = 0;
-        this.height = 0;
+        // this.width = 0;
+        // this.height = 0;
         this.projection = { x: 0, y: 0 };
 
         this.contextOptions = ContextOptions();
@@ -33,8 +33,9 @@ export default class WebGLBatchedPointRenderer {
 
     init (canvas) {
 
-        this.width = canvas.width;
-        this.height = canvas.height;
+        //  clientWidth is only available if the canvas is on the dom
+        // this.width = canvas.clientWidth;
+        // this.height = canvas.clientHeight;
 
         this.contextHandler.add(canvas);
 
@@ -53,10 +54,7 @@ export default class WebGLBatchedPointRenderer {
         gl.disable(gl.CULL_FACE);
         gl.enable(gl.BLEND);
 
-        gl.viewport(0, 0, this.width, this.height);
-
-        this.projection.x =  this.width / 2;
-        this.projection.y =  -this.height / 2;
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
         const vertexSrc = [
             'attribute vec2 aVertexPosition;',
@@ -124,9 +122,55 @@ export default class WebGLBatchedPointRenderer {
 
     }
 
-    render () {
+    resize () {
+
+        const width = this.gl.canvas.clientWidth;
+        const height = this.gl.canvas.clientHeight;
+
+        if (width !== this.gl.canvas.width)
+        {
+            this.gl.canvas.width = width;
+        }
+
+        if (height !== this.gl.canvas.height)
+        {
+            this.gl.canvas.height = height;
+        }
+
+        this.projection.x =  width / 2;
+        this.projection.y =  -height / 2;
 
     }
+
+    preRender () {
+
+        if (this.contextHandler.contextLost)
+        {
+            return;
+        }
+
+        this.resize();
+
+        const gl = this.gl;
+
+        //  Resets the frame buffer (if it's been re-assigned elsewhere via stencil, etc)
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        //  Transparent
+        // gl.clearColor(0, 0, 0, 0);
+
+        //  Black
+        gl.clearColor(0, 0, 0, 1);
+
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        this.vertexBuffer.reset();
+
+        //  Walk the scene graph
+
+    }
+
+
 
     addVerts () {
 

@@ -13,7 +13,11 @@ I'll add to this bullet list as I think of things while writing the entries belo
 
 ### 11th November 2015
 
+Today was mostly about tidying up the VertexArrayBuffer and VertexIndexBuffer classes. Also moved the 'add' specific code to its own functions (like AddQuadAlphaColor - a name I'm not set on yet). The Batched texture renderer is coming on nicely.
 
+The GLTexture class is pretty much complete as well. Tomorrow we'll see about hooking that up to the Loader so we can get it populated from image data, then get the renderer spitting out sprites.
+
+Although it feels a little redundant to be doing this, given the amount of work that's gone into the new renderer, it will still serve as an extremely useful renderer template for others. More importantly it is fully featured enough to be a solid test case for all kinds of things, from Textures to Sprites and State handling, as they can all use this renderer during development.
 
 ### 10th November 2015
 

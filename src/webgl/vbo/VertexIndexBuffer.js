@@ -12,6 +12,13 @@ export default class VertexIndexBuffer {
 
     create (gl, vertSize = 6, batchSize = 2000) {
 
+        // 65535 is the maximum buffer size (64KB)
+        if (vertSize * batchSize > 65535)
+        {
+            console.warn('VertexIndexBuffer: Cannot create buffer > 65535 bytes');
+            return -1;
+        }
+
         this.vertSize = vertSize;
         this.batchSize = batchSize;
 
@@ -30,7 +37,7 @@ export default class VertexIndexBuffer {
 
     reset () {
 
-        //  Sample indices array for 2 elements (batchSize 2)
+        //  Sample indices array for 2 elements (batchSize 2, vertSize 6)
         // [ 0, 1, 2, 0, 2, 3 ]
         // [ 4, 5, 6, 4, 6, 7 ]
 
@@ -43,6 +50,11 @@ export default class VertexIndexBuffer {
         //  combined this gives us our second quad (or the back face of a cube if we wanted)
 
         //  And so on ...
+
+        // With 6 indices per quad that's 10922 max
+
+        //  This set-up is quad specific and needs removing from 'reset' and moving to
+        //  its own class (QuadIndexBuffer probably)
 
         for (let i = 0, j = 0; i < (this.batchSize * this.vertSize); i += this.vertSize, j += 4)
         {
