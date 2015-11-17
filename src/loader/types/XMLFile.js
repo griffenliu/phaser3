@@ -1,4 +1,5 @@
 import BaseFile from 'loader/types/BaseFile.js';
+import ParseXML from 'system/ParseXML.js';
 
 export default class XMLFile extends BaseFile {
 
@@ -33,11 +34,11 @@ export default class XMLFile extends BaseFile {
 
         super.process();
 
-        this.xml = this.loader.parseXml(this.data);
+        this.xml = ParseXML(this.data);
 
         if (!this.xml)
         {
-            throw new Error("Phaser.Loader.XMLFile: Invalid XML");
+            throw new Error('Phaser.Loader.XMLFile: Invalid XML');
         }
 
         console.log(this.xml);

@@ -11,6 +11,10 @@ I'll add to this bullet list as I think of things while writing the entries belo
 * I need to find a way to allow for non-English error messages in Errors and console warnings.
 * I'd like to find a way to allow for non-English jsdocs as well, inline in the code, but not sure how without using some kind of build script (which may not be a bad idea?)
 
+### 17th November 2015
+
+Moved the XML Parser from the Loader into its own file (doesn't need to be part of the base class). Loader returns a Promise for the complete event as well (it has done for a while,  just forgot to write about it). Looking at moving the XHR loader to its own function and then it's time to move onto the master game loop.
+
 ### 11th November 2015
 
 Today was mostly about tidying up the VertexArrayBuffer and VertexIndexBuffer classes. Also moved the 'add' specific code to its own functions (like AddQuadAlphaColor - a name I'm not set on yet). The Batched texture renderer is coming on nicely.
