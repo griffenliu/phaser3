@@ -5,13 +5,7 @@ export default class BaseLoader {
 
         this.game = game;
 
-        // this.cache
-
         this.resetLocked = false;
-
-        this.isLoading = false;
-
-        this.hasLoaded = false;
 
         this.crossOrigin = false;
     
@@ -26,29 +20,62 @@ export default class BaseLoader {
         this.list = new Set();
         this.queue = new Set();
 
-        // this._processingHead = 0;
-        // this._fileLoadStarted = false;
-        // this._totalFileCount = 0;
-        // this._loadedFileCount = 0;
+        this.onStateChange = null;
+        this._state = 0;
+
+    }
+
+    get state () {
+
+        return this._state;
+
+    }
+
+    set state (value) {
+
+        if (this._state !== value)
+        {
+            this._state = value;
+            this.onStateChange(this);
+        }
+
+    }
+
+    get loading () {
+
+        return (this._state === BaseLoader.LOADING);
 
     }
 
     start () {
 
-        if (this.isLoading)
+        if (this.loading)
         {
             return;
         }
 
+        const promise = new Promise(
+            (resolve, reject) => {
+                this.onStateChange = function () {
+                    if (this.state === BaseLoader.COMPLETE)
+                    {
+                        resolve(this);
+                    }
+                    else if (this.state == BaseLoader.FAILED)
+                    {
+                        reject(this);
+                    }
+                }
+            }
+        );
+
         if (this.list.size === 0)
         {
-            this.hasLoaded = true;
             this.finishedLoading();
         }
         else
         {
-            this.hasLoaded = false;
-            this.isLoading = true;
+            this.state = BaseLoader.LOADING;
 
             this.queue.clear();
 
@@ -57,11 +84,13 @@ export default class BaseLoader {
             this.processLoadQueue();
         }
 
+        return promise;
+
     }
 
     processLoadQueue () {
 
-        if (!this.isLoading)
+        if (!this.loading)
         {
             console.warn('Phaser.Loader - active loading canceled / reset');
             this.finishedLoading(true);
@@ -138,7 +167,8 @@ export default class BaseLoader {
 
         console.log('finishedLoading, about to start processing');
 
-        //  process all the files
+        this.state = BaseLoader.PROCESSING;
+
         for (let file of this.queue)
         {
             if (file.parent)
@@ -150,6 +180,8 @@ export default class BaseLoader {
                 file.process();
             }
         }
+
+        this.state = BaseLoader.COMPLETE;
 
     }
 
@@ -206,4 +238,22 @@ export default class BaseLoader {
 
     }
 
+    destroy () {
+
+        this.list.clear();
+        this.queue.clear();
+
+        this.state = BaseLoader.DESTROYED;
+
+    }
+
 }
+
+//  Class constants
+
+BaseLoader.PENDING = 0;
+BaseLoader.LOADING = 1;
+BaseLoader.PROCESSING = 2;
+BaseLoader.COMPLETE = 3;
+BaseLoader.FAILED = 4;
+BaseLoader.DESTROYED = 5;
