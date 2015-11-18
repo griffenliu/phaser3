@@ -63,7 +63,7 @@ added 'tick' counter to see if crash is consistent: 625, 1049, 958... nope
 Found it... when debug uses gl.createTexture it's creating a new 800x600 texture on the GPU every frame (it copies the canvas up).  The JS handles for that new texture go out of scope as soon as the function finishes with the gl draw calls, however the Garbage Collector might take a while to get around to cleaning it up... and sometimes that can take so long that WebGL runs out of memory (even on my high-powered PC GPU!) and we get a "context lost" situation as webgl valiantly tries to recover.  Simple fix... I've added a gl.destroyTexture call at the end of drawCanvasWithTransform to manually clean up the textures as soon as they are drawn.  NOTE: this might not be an ideal solution for systems that don't dirty the canvas every frame as it may either: fail to renew the texture causing the wrong graphics to display, OR, force the texture to renew more often than it absolutely needs to.
 
 "body debug" runs, but there's no green debug rectangle over the sprite.  Ok, looks like the render sequence is still messed up and the debug is going 'under' the sprite layers.  I'll need to move rendering out of Group.update (which is called as part of updateLogic, not updateRender).
-Did all that, but the green square still isn't showing, however now when the object moves behind debug text, the text turns green for the overlap area(?!)  It's the shader not handling transparency correctly, I really  must look into that soon.  Temporary fix: change the threshold in the imageShaderSources to 0.1 alpha.
+Did all that, but the green square still isn't showing, however now when the object moves behind debug text, the text turns green for the overlap area(?!)  It's the shader not handling transparency correctly, I really must look into that soon.  Temporary fix: change the threshold in the imageShaderSources to 0.1 alpha.
 
 A previous change has stopped the Asteroids demo bullets from drawing - probably the Group rendering changes.  Looks like the 'bullets' group is emptied on the first frame after the background and ship draw.  That was dumb, all Layer objects get killed if their update returns false.  When I moved Group.update to Group.render I left Group.update empty, which returns undefined, which evaluates to false in this case.  The entire bullet group was getting killed by the first render update.
 Renamed all 'update' functions in the render pipeline to 'render' for consistency and to make the logic/render division more apparent.
@@ -147,6 +147,24 @@ Seems like a good place to wrap up this extremely long log.
 
 
 Coming soon / TODO:
+
+TODO: I used a horrible solution (number of children / 100000).  Either keep a Group counter, or require that all children specify a suitable 'z' rather than calculating it automatically.
+
+TODO: bracket the webgl drawing code to detect the 'empty' default canvas and skip drawing it, to avoid the big red 'x' before the first click here
+
+TODO: smoothing modes are not available in the new renderer, so the 4x zoomed 'mummy' in this example is blurred rather than clean large pixels
+
+Example: Animation - "creature dragon multiple" source code has changed on phaser.io but not in the repo from which I'm drawing the examples so I'm going to pass on this one for now until I can work out where the current source is being stored.
+
+TODO: Stage.backgroundColor is not set to the DOM and I can't see where that used to be done from.  Dig out an original version of Phaser and track it down, then reintroduce the functionality.
+
+TODO: 'fullScreen' should be replaced with an actual render size for tiled sprites.  (We might want something to tile which is not a background for instance!)
+
+rename MyPoint and try to clean up that approach to fix the get/set problems
+
+revisit and tidy up: I've added a gl.destroyTexture call at the end of drawCanvasWithTransform to manually clean up the textures as soon as they are drawn.  NOTE: this might not be an ideal solution for systems that don't dirty the canvas every frame as it may either: fail to renew the texture causing the wrong graphics to display, OR, force the texture to renew more often than it absolutely needs to.
+
+The bounds member is calculated on every render pass for every pbTransformObject (TODO: if this feature is never used in a given product, it would be a nice speed boost to permit a bypass of these calculations)
 
 find out why the cursor turns into an I beam on mouse-down in my demos but not in phaser.io
 
