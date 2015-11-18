@@ -1,0 +1,230 @@
+Phaser 3 renderer progress.
+2015-11-17
+
+The WIP can be found here: https://github.com/photonstorm/phaser3/tree/master/renderer
+A recent online demo is here: http://www.insanehero.com/html/renderer/src/
+The project commit log is here: https://github.com/photonstorm/phaser3/commits?author=pjbaron
+
+The phaser-sans-pixi fork is here: https://github.com/pjbaron/phaser
+The phaser and new renderer branch is here: https://github.com/pjbaron/phaser/tree/new_renderer
+
+5th, 6th, 12th, 13th October, 2nd, 3rd, 4th, 5th, 6th, 9th, 12th, 13th, 16th, 17th November
+
+This update:
+
+Fixed the Basics, render text example to work with the new renderer.  Added 'fromCanvas' to pbWebGlImage to allow the web gl texture source to be a canvas and to update the contents as necessary (using the Phaser.Text isDirty flag).
+
+Found and fixed a double property definition problem where pbSprite uses 'width' and so does Phaser.Text (which extends Phaser.Sprite, which extends pbSprite).  This isn't normally a problem but in this case I added a 'resize' function to pbSprite which is called in Text... so when I try to access 'width' it uses the Phaser.Text version which caused a recursive loop (going back through updateText and into resize again).  In this case the solution was easy because pbSprite.width is a purely convenience function which redirects to transform.width... so I can just access that directly instead.  However I can see there could be more problems in the future if object prototypes frequently redefine basic elements of the objects they are extending.  I recommend we avoid using defineProperty in this way going forwards, unfortunately we'll have to live with the instances already in the code... or break the examples.
+
+Found and fixed a problem with the 'z' coordinate calculation in Group.js so it will work with the new renderer (z values must be between 0 and 1 inclusive for webgl).
+TODO: I used a horrible solution (number of children / 100000).  Either keep a Group counter, or require that all children specify a suitable 'z' rather than calculating it automatically.
+WARNING: this will fail (objects will not draw) if there are more than 100000 in a single group as the resulting 'z' coordinate will be > 1.0
+
+TODO: bracket the webgl drawing code to detect the 'empty' default canvas and skip drawing it, to avoid the big red 'x' before the first click here
+
+All "Basics" examples are now working with the new renderer.
+
+Modified Cache to correctly create a 'grid' type pbSurface when building a 'spritesheet' type object.  Example: Animation - "Animation Events" is now working.
+TODO: sprites and text are drawing black in place of transparent pixels
+TODO: smoothing modes are not available in the new renderer, so the 4x zoomed 'mummy' in this example is blurred rather than clean large pixels
+
+Fixed Example: Animation - "change texture on click" to work by ensuring that LoadTexture.loadTexture recreates the Phaser.Sprite pbSprite when a new texture is loaded to replace the old one.
+Finally deprecated Sprite.texture in favour of pbSprite.surface and/or pbSprite.image (depending on the access).
+
+Example: Animation - "creature dragon multiple" source code has changed on phaser.io but not in the repo from which I'm drawing the examples so I'm going to pass on this one for now until I can work out where the current source is being stored.
+
+Weird bug in Animation - "destroy animation"... unless I call createSprite after creating the group, nothing ever draws.  If I do call that, then about half the time it draws, the rest of the time I see a flicker of the first one created then nothing.  All the render functions appear to be operating with valid data.
+Found a bug that when switching from a single sprite renderer to a batch sprite renderer, the webgl surface and buffers were not renewed (the surface is not dirty, but the shader program changed).  By correcting this I fixed the "destroy animation" demo.
+
+Reintroduced game.stage and Phaser.Stage albeit with drastically reduced powers and responsibilities.  Now it's mainly just a handy place for users to access stuff like backgroundColor.  TODO: Stage.backgroundColor is not set to the DOM and I can't see where that used to be done from.  Dig out an original version of Phaser and track it down, then reintroduce the functionality.
+Loads of Example demos are now running... they were broken only by the removal of game.stage.backgroundColor.
+
+"Examples: Animation - multiple anims" is not working due to lack of a suitable pbSurface constructor to take the "Starling" style texture atlas data.
+
+Finished Animation examples except Creatures (code disparity between repo and phaser.io) and DragonBones (removed from phaser.io).  Started in on the "arcade physics" examples.  I'm going to need Phaser.Debug working for these, but the TODO in that file suggested that it might work again once Phaser.BitmapData is integrated - which it now is...
+Yep, a few minor tweaks and Phaser.Debug is working again so we can get demo information on-screen.
+
+Spent a few hours adding a new feature to the upcoming Phaser Grid API which will make tetris/minesweeper/match3 and anything else with a gridded background, significantly easier!
+
+Working: accelerate to pointer, angle between, angle to pointer, angular acceleration, angular velocity
+
+"Asteroids" demo: there's no starfield, no bullets, the ship is not drawing transparency at its edges, and the demo seems to crash webgl after a while... plenty to fix here!
+I've reinstated Phaser.TileSprite into the build and worked out why they weren't drawing (pbTransformObject wasn't checking for the Phaser.TileSprite type).  TODO: They aren't currently tiling.
+Added tiling and set the fullScreen flag, so the starfield will now fill the background.  TODO: 'fullScreen' should be replaced with an actual render size for tiled sprites.  (We might want something to tile which is not a background for instance!)
+Reinstated fragment shader code to respect transparency (if (gl_FragColor.a < 0.80) discard;).. TODO: this is a very dodgy solution, why isn't alpha being drawn correctly by the shaders?  Turns out I'm using the exact same solution in the batch drawing, so it looks like my fragment shaders have never done alpha shading 'properly'... definitely need to investigate that later.
+The code in Components.Reset (line 34) this.position.set(x, y); caused some major pains.  Because it's a Component it's potentially used by tons of different objects (making refactoring it a risky and lengthy business).  Unfortunately it assumes that position.set will be able to change the x,y properties of whatever 'position' is, i.e. it's indirectly assuming that 'position' will be a Phaser.Point.  For pbSprite I need to update the transform member and call a function to apply the changes to the transform matrix.  I initially thought that writing a defineProperty for position would do the job, but of course this.position causes the 'get' function to return the Phaser.Point, so this.position.set(x,y) acts through the Point.set function instead.
+I raised a question on Stack Overflow about this: http://stackoverflow.com/questions/33490188/how-to-use-set-on-object-properties-when-the-property-type-has-a-set-of-its
+And the solution that worked is to create a new object with it's own 'set' method which does what I want to do.  I've added MyPoint (terrible name I know, I'll change it soon) to test that approach and it does work without needing to refactor Reset or Phaser.Point at all.  This fixes the bullets (and all other demos that use reset to set sprite positions).
+
+The final problem with the asteroids demo is that it still crashes webgl after you've been on the page for a little while (less than 3 minutes), I suspect a surface or buffer leak and I'll try to track that down next.
+Looks like the debug layer might be the problem, I've disabled the pbBaseLayer call drawCanvasWithTransform and it no longer crashes. I'll reinstate that call but remove the debug stuff and test with a demo that uses text (text also uses drawCanvasWithTransform) to work out if it's the gl calls or something in Debug.
+Yep, it's debug.  The "animation events" demo crashes with it enabled, but not with it disabled, even with text displaying... now to find out why!
+added 'tick' counter to see if crash is consistent: 625, 1049, 958... nope
+Found it... when debug uses gl.createTexture it's creating a new 800x600 texture on the GPU every frame (it copies the canvas up).  The JS handles for that new texture go out of scope as soon as the function finishes with the gl draw calls, however the Garbage Collector might take a while to get around to cleaning it up... and sometimes that can take so long that WebGL runs out of memory (even on my high-powered PC GPU!) and we get a "context lost" situation as webgl valiantly tries to recover.  Simple fix... I've added a gl.destroyTexture call at the end of drawCanvasWithTransform to manually clean up the textures as soon as they are drawn.  NOTE: this might not be an ideal solution for systems that don't dirty the canvas every frame as it may either: fail to renew the texture causing the wrong graphics to display, OR, force the texture to renew more often than it absolutely needs to.
+
+"body debug" runs, but there's no green debug rectangle over the sprite.  Ok, looks like the render sequence is still messed up and the debug is going 'under' the sprite layers.  I'll need to move rendering out of Group.update (which is called as part of updateLogic, not updateRender).
+Did all that, but the green square still isn't showing, however now when the object moves behind debug text, the text turns green for the overlap area(?!)  It's the shader not handling transparency correctly, I really  must look into that soon.  Temporary fix: change the threshold in the imageShaderSources to 0.1 alpha.
+
+A previous change has stopped the Asteroids demo bullets from drawing - probably the Group rendering changes.  Looks like the 'bullets' group is emptied on the first frame after the background and ship draw.  That was dumb, all Layer objects get killed if their update returns false.  When I moved Group.update to Group.render I left Group.update empty, which returns undefined, which evaluates to false in this case.  The entire bullet group was getting killed by the first render update.
+Renamed all 'update' functions in the render pipeline to 'render' for consistency and to make the logic/render division more apparent.
+Asteroids bullets show up fine now, but still display after their life expires.  "visible" wasn't being passed through from pbSprite to pbTransformObject - easy fix!  Asteroids demo is once again working correctly.  Quickly flicked through all Basics/Animations and Arcade examples covered so far, nothing else seems to have broken with recent changes.  Moving along...
+
+"body enable" - crash Physics/Arcade/World.js:986 body2 does not have a position parameter.  Ah yep, it's changed to x,y as members, fixed. Body2 is not bouncing off body1.  That's odd, I don't think the new renderer should have affected physics behaviour at all...
+Looks like the render order isn't quite sorted yet.  preUpdate for Body is being called in the same callstack as Phaser.Group.render.  I think this is permitting a reset of the Body.prev location memory in the wrong sequence.  What is certain is that when the demo calls game.physics.arcade.collide the Body.prev value matches the Body.x/.y values and so the physics collide fails in separateY.  I'll get back into this tomorrow.
+There's a bit of a mess to resolve here.  The preUpdate/update/postUpdate functions are being called incorrectly since I merged the new renderer in... surprised it's not causing more chaos tbh!  Phaser.Sprite.preUpdate calls Component.Core.preUpdate which (amongst other things) loops for all children and preUpdates them.  The new renderer layers which extend pbTransformObject expect to be responsible for the entire draw hierarchy, and also iterate for all children, calling preUpdate, update, and postUpdate for each child in turn.
+I've removed all logic updates from pbTransformObject, and added functions to Group and initiating calls to Game.updateLogic which go via World (the root Group).  This has fixed 'body enable' example, but it's quite a significant change of processing order so I'll just quickly go through all previous examples and make sure I didn't break anything else.
+
+Looks like it's just the asteroids bullets which don't move or die.
+
+Nasty, the bullets are added to a new Group which is added to World, however world looks at the object added and sees it's a layer so it gets added to 'list' instead of 'children'.  Now I really have to decide if I want to keep the list/children division for the renderer or not (this was first mentioned very early in the new renderer project).  If I keep it, I'll need to duplicate the list/child expansion used by pbBaseLayer in Phaser logic code.  If I lose it, we potentially lose a very powerful feature for handling simultaneous display lists and reordering them in bizarre ways.
+Had a quick chat with Rich and it sounds like Phaser 3 will definitely be able to use the flat list approach, so I'll extend the expansion to apply to the logic update and render update equally.
+Modified Group functions: preUpdate, update, postUpdate and iterate to expand the flat list after the children.
+
+"body scale", "bounce", "bounce accelerator", "bounce knock", "bounce with gravity", "bounding box", are all working except for a background colour change.
+
+"custom sprite vs group" is working but the Phaser guy is going *behind* the food sprites, and in the original he goes in front... it looks like this demo uses multiple Group objects so perhaps the new renderer is treating layers differently to how Phaser expects them.
+This is more fundamental than it first appears.  After comparing with the code for the renderer demo pbInvaderDemoCore I remembered how the layers work in the new renderer.  Because the layers are processed separately and after the children, they will always draw above children at the same level of the hierarchy.  The way around this is to simply create layers in the correct order for your display list.  In this phaser example, the Phaser guy is being added directly to the World layer, so of course he goes behind the "veggies" layer.  I want to avoid altering the example code if at all possible, so one solution here is to change things so that children added to World actually get added to a child layer of World which is created when the first child is added.  This will ensure that the new layer will appear at the correct depth relative to any other layers being created and added to World.
+Another solution would be to reinstate the Stage concept, have World added to Stage, and add all new layers to Stage also while child sprites are added to World.  I'm not so keen on this second idea - I think it might get messy trying to lever it in so that existing demos don't need to change.
+I've changed some of the fundamentals of the new renderer to fit the Phaser design a bit better.  It no longer uses a depth buffer to provide (dodgy) sprite ordering within a layer.  Ordering within a layer is now down to the painter's algorithm (the things that are drawn first will always be 'painted over' by later things that overlap them).  This change combined with the new layer added to World when a loose sprite is added directly to the game.world fixes the priority issues.
+
+The changes to priority have resulted in the debug layer being drawn behind the game objects.  It looks like the debug layer is added very early (in the Phaser.Utils.Debug.boot function) and the painter's algorithm means it will always be painted over.  I'm a bit unsure how this ever worked, because AFAIK Phaser processes the display list from top to bottom also, so the debug layer should always have been covered up.  I asked Rich about this: "The root display object in Pixi 2 is the Stage. All Phaser game objects are added to the World, which is the first thing in the Stage. The Debug layer is the second. Phaser will never add anything else to the Stage, hence it always appears on the top (although technically devs could add something and obscure it, but that's their call)."  So that's one minor mystery solved :)
+I tried a quick "bringToTop" in the debug preUpdate function but that highlights a new problem with the flat list approach: all the child functions (add/remove/bringToTop etc) expect there to be a single list of children and are not configured to handle the flat list alternatives for layers.
+Added a new parameter to Group: fixDepth.  When -1 this is disabled, otherwise the Group will reposition itself (when its preUpdate is called) in its parent layer list to the specified index position.  Using 0 will make the layer be the first thing drawn, so it will be underneath all other layers of this parent (great for backgrounds), using MAX_SAFE_INTEGER will make the layer be the last thing drawn, so it will be above all other layers of its parent (great for UI, and in this case the Phaser.Debug group uses it to stay on top of the World).
+
+"direct body movement" example works except for the background colour change.
+
+Fixed bug in pbDictionary processing order that made the ball go behind the background in 'distance to pointer' example.  The camera is not focusing on the ball, but I haven't found where the camera update is supposed to be called from in the original Phaser yet (it's not being called at all in my build).
+Ah it was done by Stage, which no longer exists.  Looks like that should slide into World.update comfortably enough.
+After a considerable debug, I found a pair of bugs in the renderer/phaser interface which were breaking the camera.  Easy fixes at least... pbSprite wasn't passing 'parent' settings through to it's transform parameter where they belonged, and Group was creating the new layers with a parameter missing so the angleInRadians was getting the scaleX value!  This fixes "distance to pointer".
+
+"global pause" works.
+"gravity and drag" works.
+"gravity" works.
+
+"group vs group" crashes on first shot... Phaser.Sprite.getBounds is undefined.  Looks like it inherited from PIXI.Sprite.
+
+Added a getBounds function to pbSprite and a bounds member to pbTransformObject.  The bounds member is calculated on every render pass for every pbTransformObject (TODO: if this feature is never used in a given product, it would be a nice speed boost to permit a bypass of these calculations). 'bounds' contains an AABB which encloses the rotated bounding AABB of the original image.  It takes into account the anchor point, scaling, rotation and translation, and is in world coordinates (the parent transforms are applied first).
+NOTES: I would like to separate this calculation from the rendering, however it needs the display list to be processed in the correct order so that parent transforms all the way back up to World are included.  I don't see a good way of doing this without duplicating the entire display list traversal, which seems like a very expensive alteration to merely separate logic from render...  However, if we process every object's 'update' function in a duplicate of the display list traversal, it might make sense to squeeze this calculation into the preUpdate calls provided that all preUpdates are processed before any updates.
+
+The bullets now kill the fruit and veggies, however their 'kill' callback is not working when they leave the screen, so eventually we run out of bullets.  Two more bugs in my code fixed, and it's working properly now.  This fixes the "group vs group" demo.
+
+"group vs self" works.
+"larger bounding box" works.  The debug layer looks flickery sometimes, it's not crucial but I'll add a TODO to check that.
+
+"launcher follow world" demo crashes with call stack size exceeded (something is recursing too deeply).  It's the get/set for x,y which were changed from this.position.x/y to this.x/y during the blanket removal of 'position' for the new renderer.  It looks like the Phaser.Graphics class is incomplete since the removal of PIXI, so this must be the first example to use it.
+The new renderer has extremely limited support for Graphics drawing (drawRect and fillRect... proof of concept only), and this demo needs a line drawer.
+I've started a quick first attempt to use PIXI graphics classes for webGl graphics support (rather than reinvent the wheel).
+No, I'm unhappy with how this keeps expanding out to include more files which all need converting to the Phaser style.  I'm preserving work in a branch (pixi_graphics) while I try another approach - draw to a transparent canvas then use webgl to blit it... exactly like the debug layer.
+
+Before I get too far into that, I want to try all the rest of the Arcade Physics examples which I haven't even looked at yet, and see how we're doing:
+
+"mass velocity test" works.
+*** "move to pointer" fails - missing update.
+"move towards object" works.
+"multi angle to pointer" works.
+*** "multiball" fails - missing 'allowGravity' and 'velocity'
+"nested group" works.
+"offset bounding box" works.
+"one way collision" works.
+** "platformer basics" works, except the number in the top corner is 'null' instead of '60' (fps counter?)
+"platformer tight" works.
+"process callback" works.
+"quadtree collision infos" works. (But surprisingly fails on phaser.io lol, I think someone is updating the files)
+"ship trail" works.
+* "shoot the pointer" works. Note: clicking mouse in my demos causes it to turn into an "I" beam cursor, not so on Phaser.io
+"snake" works.
+"sort direction vertical" works.
+"sort direction" works.
+"sprite vs group" works.
+"sprite vs sprite" works.
+"vertical collision" works.
+
+Two failures and a couple of minor differences that need to be investigated... that's great, things are coming together nicely!
+Seems like a good place to wrap up this extremely long log.
+
+
+
+
+
+Coming soon / TODO:
+
+find out why the cursor turns into an I beam on mouse-down in my demos but not in phaser.io
+
+find out why the debug layer is flickering. eg. Arcade Physics: larger bounding box demo
+
+check processing order to ensure that the camera is following the target objects latest position (not lagging by one frame)
+
+adjust background colour for demos like "bounding box" after the collision
+
+find out what the Group hash is for and if it's still needed (eg. in remove function)
+
+Replace all sprite.texture references with the correct option from sprite.surface and sprite.image
+Deprecate Phaser.Frame if possible, pbSurface, pbImage and the simple cellFrame should theoretically perform all the same tasks.
+BitmapText needs to extend from new renderer.
+
+
+From Phaser:
+Tile maps in different formats (csv, json, cybernoid see sci fly.js) and more capable... src/tilemaps.  Optimise for webgl to avoid huge textures.  
+Grab the Frames class and use it for more advanced texture atlas handling.
+Support TexturePacker atlasses which use multiple images with one json file.
+
+
+SpriteDLight:
+Calculate a normal map and graphic for a 'perfect' sphere and plug it into the balls demo.
+Make a 'snooker' demo with really high quality balls.
+Set up a rendering pipeline/new shader to use the position of pbSprites to get the lighting offsets, yet render them to rttTextures and feed those to the pbSprite.
+Add occlusion to the spriteDLight shader (create new shaders so user has all options available).
+
+Modify pbSprite to accept the output from user shaders == Add capability for sprites to use the render-to-texture as a source but otherwise display as currently.
+
+Canvas:
+Fix all canvas demos (they got left behind during the recent API changes).
+Improve canvas implementation to use faster, cleaner classes and interfaces.
+
+New functions:
+Provide api function to permit async processing before allLoaded fires (Timer?)... for preloaders etc.
+Add API to simplify drawing to the texture.
+
+Alterations:
+Sort out preUpdate, update and postUpdate via the pbTransformObject display list.  In particular work out how to separate logic from rendering to fit the expectations of Phaser.Game.updateLogic and Phaser.Game.updateRender.
+
+Alternate panning system: apply offsets to immediate children of any pbTransformObject.  Or maybe a whole separate transform?  This turns any layer into a camera capable of panning (zooming/rotating if transform).
+
+Make texture dictionary handle GPU textures transparently to pbSurface etc. Assign a key when adding it then forget about the source.
+Try to find alternative to setting gl.viewport to the texture size... it requires everything else to be scaled by (screen size / texture size) to draw at the correct sizes.
+
+Update rttCamera and/or multiCamera demo to use new rtt sprites.
+
+Integrate the 'creature' drawing tricks into the primary render system with a few new API calls and a "drawing queue" system to allow the user to schedule a complicated series of drawings and system changes.
+
+The bump shader needs to handle different bump textures for different tiles... probably the best way to do this is to have a bump texture which parallels the tile texture (all tiles in the same positions in both textures).  I need to decide if I want bump mapping for wall tops (currently when it's on top of a wall it's using a flat shader for the lighting effect over-spill).
+
+The bump shader needs some work to permit a tile-map of different bump textures, currently it just tiles a single one for the whole ground area.
+
+Explore replacing the current "super" implementation with simple prototype declarations... for derived classes specify exactly and only the functions that are derived using the prototype syntax... is it possible to call super functions this way?  If this can work it'll reduce call overhead in the crucial drawing stack loops considerably.
+
+Optimisations:
+
+Investigate overlapping on GPU (upload next image while first one is processing, etc) see:
+http://on-demand.gputechconf.com/gtc/2013/webinar/gtc-express-itseez-opencv-webinar.pdf (pg 24)
+
+
+New Demos:
+Make a more impressive render-to-texture sprite demo... the distinguishing feature of this ability is the pre-render (otherwise it's just like cameras again... only transparent backgrounds ie. sprites...)  Maybe extend the rtt camera demo to use sprites??
+
+External tools and utilities:
+Test the demos in Cocoon.
+Add modification tools to the bump map editor so it's possible to edit the pseudo-3D image of the bump surface and generate the bump data image.  Extend the bump map editor to use the 'b' colour component to carry further information (height or reflectivity) to improve the power of this approach.  Carry those changes over into the shader code.
+
+Research:
+Look into "how to build shaders dynamically" (find a good structure) so we can have several shader effects in a single shader program and avoid the overhead of running them sequentially.  Take a closer look at "ShaderFrog" to verify if it's using the 'bouncing texture' approach or is building shaders the way I'd like to.
+
+Bugs:
+Fix the in-game bump shader (it's still shading the vertical component reversed - already fixed in the editor c# code).
+
+TODO:
+Find all 'TODO' code and commit comments and: make a full list in one place; prioritise the list; start knocking things off until it's all dealt with.
+Address all PJBNOTE comments in the Phaser source code where PIXI references have been removed, by modifying Phaser or the new renderer (or both) to work together.
+
+- Pete
+
